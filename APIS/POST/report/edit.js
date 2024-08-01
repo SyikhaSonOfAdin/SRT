@@ -1,13 +1,15 @@
-const reportInstance = require('../../../src/modules/report');
+const { reportInstance } = require('../../../src/modules/report');
+const Security = require('../../../src/middleware/security');
 const ENDPOINTS = require('../../../.conf/.conf_endpoints');
 const SRT = require('../../../.conf/.conf_database');
 const express = require('express');
-const companyInstance = require('../../../src/modules/company');
 const router = express.Router();
 const queues = new Map();
 
-router.post(ENDPOINTS.POST.REPORT.EDIT, async (req, res) => {
-    const { companyId, locationId, departmentId, categoryId, inputBy, reportIssued } = req.body;
+const security = new Security()
+
+router.post(ENDPOINTS.POST.REPORT.EDIT, security.verifyToken, async (req, res) => {
+    const { companyId, locationId, departmentId, categoryId, reportId } = req.body;
 
     if (!companyId) {
         return res.status(400).json({ message: "Invalid parameters" });
@@ -25,16 +27,18 @@ router.post(ENDPOINTS.POST.REPORT.EDIT, async (req, res) => {
 
     try {
         await queue.add(async () => {
-            await CONNECTION.beginTransaction();            
-            await reportInstance.add(CONNECTION, locationId, departmentId, categoryId, ticketNo, inputBy, reportIssued);
-            await CONNECTION.commit();
-            res.status(200).json({ message: "Report edited" });
+            try {
+                await reportInstance.edit(CONNECTION, locationId, departmentId, categoryId, reportId)
+                res.status(200).json({ message: "Report edited" });
+            } catch (error) {
+                res.status(500).json({ message: error.message });
+            } finally {
+                CONNECTION.release();
+            }
         });
     } catch (error) {
         await CONNECTION.rollback();
         res.status(500).json({ message: error.message });
-    } finally {
-        CONNECTION.release();
     }
 });
 

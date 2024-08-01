@@ -15,23 +15,36 @@ class Report {
             await CONNECTION.query(QUERY[0], PARAMS[0])
         } catch (error) {
             throw error
-        } finally {
-            CONNECTION.release()
+        }
+    }
+
+    edit = async (CONNECTION, locationId, departmentId, categoryId, reportId) => {
+        const QUERY = [
+            `UPDATE ${TABLES.REPORT.TABLE} SET ${TABLES.REPORT.COLUMN.LOCATION_ID} = ?, ${TABLES.REPORT.COLUMN.DEPARTMENT_ID} = ?, 
+            ${TABLES.REPORT.COLUMN.CATEGORY_ID} = ? WHERE ${TABLES.REPORT.COLUMN.ID} = ?`
+        ]
+        const PARAMS = [[locationId, departmentId, categoryId, reportId]]
+
+        try {
+            await CONNECTION.query(QUERY[0], PARAMS[0])
+        } catch (error) {
+            throw error
         }
     }
 
     get = async (companyId) => {
         const CONNECTION = await SRT.getConnection()
         const QUERY = [`
-            SELECT R.${TABLES.REPORT.COLUMN.TICKET}, R.${TABLES.REPORT.COLUMN.INPUT_BY} AS REPORT_BY, CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.NAME} AS DEPARTMENT,
+            SELECT R.${TABLES.REPORT.COLUMN.ID}, R.${TABLES.REPORT.COLUMN.TICKET}, R.${TABLES.REPORT.COLUMN.INPUT_BY} AS REPORT_BY, CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.NAME} AS DEPARTMENT,
             CL.${TABLES.COMPANY_LOCATIONS.COLUMN.NAME} AS LOCATION, DATE_FORMAT(R.${TABLES.REPORT.COLUMN.INPUT_DATE}, '%Y-%m-%d') AS INPUT_DATE,
             COALESCE(DATE_FORMAT(RD.${TABLES.REPORT_DETAIL.COLUMN.FINISH_DATE}, '%Y-%m-%d'), '-') AS FINISH_DATE, R.${TABLES.REPORT.COLUMN.REPORT_ISSUE} AS REPORT_ISSUE,
-            RD.${TABLES.REPORT_DETAIL.COLUMN.ASSIGNED_USER} AS ASSIGNED_TO, R.${TABLES.REPORT.COLUMN.STATUS} AS STATUS,
+            U.${TABLES.USER.COLUMN.USERNAME} AS ASSIGNED_TO, R.${TABLES.REPORT.COLUMN.STATUS} AS STATUS,
             RD.${TABLES.REPORT_DETAIL.COLUMN.RESULT} AS RESULT,
             RD.${TABLES.REPORT_DETAIL.COLUMN.PROBLEMS} AS PROBLEM,
             RD.${TABLES.REPORT_DETAIL.COLUMN.SOLUTIONS} AS SOLUTION
             FROM ${TABLES.REPORT.TABLE} AS R 
             LEFT JOIN ${TABLES.REPORT_DETAIL.TABLE} AS RD ON R.${TABLES.REPORT.COLUMN.ID} = RD.${TABLES.REPORT_DETAIL.COLUMN.REPORT_ID}
+            LEFT JOIN ${TABLES.USER.TABLE} AS U ON RD.${TABLES.REPORT_DETAIL.COLUMN.ASSIGNED_USER} = U.${TABLES.USER.COLUMN.ID}
             JOIN ${TABLES.COMPANY_DEPARTMENTS.TABLE} AS CD ON R.${TABLES.REPORT.COLUMN.DEPARTMENT_ID} = CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.ID}
             JOIN ${TABLES.COMPANY_LOCATIONS.TABLE} AS CL ON R.${TABLES.REPORT.COLUMN.LOCATION_ID} = CL.${TABLES.COMPANY_LOCATIONS.COLUMN.ID}
             JOIN ${TABLES.COMPANY.TABLE} AS C ON CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.COMPANY_ID} = C.${TABLES.COMPANY.COLUMN.ID}
@@ -80,7 +93,20 @@ class Report {
             throw error
         }
     }
+
+    updateStatus = async (CONNECTION, reportId) => {
+        const QUERY = [`UPDATE ${TABLES.REPORT.TABLE} SET ${TABLES.REPORT.COLUMN.STATUS} = "IN PROGRESS" WHERE ${TABLES.REPORT.COLUMN.ID} = ?`]
+        const PARAMS = [[reportId]]
+        try {
+            await CONNECTION.query(QUERY[0], PARAMS[0])
+        } catch (error) {
+            throw error
+        }
+    }
 }
 
 const reportInstance = new Report()
-module.exports = reportInstance
+module.exports = {
+    reportInstance,
+    Report
+}

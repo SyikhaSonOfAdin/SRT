@@ -15,6 +15,7 @@ const ENDPOINTS = {
         },
         REPORT: {
             ADD: '/report/add',
+            ASSIGN: '/report/assign',
             EDIT: '/report/edit',
         }
     }

@@ -1,6 +1,6 @@
+const { reportInstance } = require('../../../src/modules/report');
 const Security = require('../../../src/middleware/security');
 const ENDPOINTS = require('../../../.conf/.conf_endpoints');
-const report = require('../../../src/modules/report');
 const express = require('express');
 const router = express.Router();
 
@@ -16,7 +16,7 @@ router.get(ENDPOINTS.GET.REPORT.BY_COMPANY_ID, security.verifyToken, async (req,
     }
 
     try {
-        const DATA = await report.get(companyId)
+        const DATA = await reportInstance.get(companyId)
         res.status(200).json({
             data: DATA
         })

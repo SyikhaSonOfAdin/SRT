@@ -1,18 +1,18 @@
-const companyInstance = require('../../../src/modules/company');
-const { reportInstance } = require('../../../src/modules/report');
+const { reportDetailInstance } = require('../../../src/modules/reportDetail');
 const Security = require('../../../src/middleware/security');
 const ENDPOINTS = require('../../../.conf/.conf_endpoints');
 const SRT = require('../../../.conf/.conf_database');
 const express = require('express');
+const { reportInstance } = require('../../../src/modules/report');
 const router = express.Router();
 const queues = new Map();
 
 const security = new Security()
 
-router.post(ENDPOINTS.POST.REPORT.ADD, security.verifyToken, async (req, res) => {
-    const { companyId, locationId, departmentId, categoryId, inputBy, reportIssued } = req.body;
+router.post(ENDPOINTS.POST.REPORT.ASSIGN, security.verifyToken, async (req, res) => {
+    const { companyId, userId, reportId } = req.body;
 
-    if (!companyId) {
+    if (!companyId || !userId || !reportId) {
         return res.status(400).json({ message: "Invalid parameters" });
     }
 
@@ -28,15 +28,23 @@ router.post(ENDPOINTS.POST.REPORT.ADD, security.verifyToken, async (req, res) =>
 
     try {
         await queue.add(async () => {
-            await CONNECTION.beginTransaction();
             try {
-                const companyCode = await companyInstance.getCompanyCode(companyId);
-                const ticketNo = await reportInstance.generateTicketNo(CONNECTION, companyId, companyCode);
-                await reportInstance.add(CONNECTION, locationId, departmentId, categoryId, ticketNo, inputBy, reportIssued);
-                await CONNECTION.commit();
-                res.status(200).json({ message: "Report submitted" });
+                await CONNECTION.beginTransaction();
+
+                const isExist = await reportDetailInstance.isExist(CONNECTION, reportId);
+
+                if (isExist) {
+                    await CONNECTION.rollback()
+                    return res.status(409).json({ message: "Already assigned to other user" });
+                }
+
+                await reportDetailInstance.assign(CONNECTION, userId, reportId)
+                await reportInstance.updateStatus(CONNECTION, reportId)
+                
+                res.status(200).json({ message: "Assigned" });
+                await CONNECTION.commit()
             } catch (error) {
-                await CONNECTION.rollback();
+                await CONNECTION.rollback()
                 res.status(500).json({ message: error.message });
             } finally {
                 CONNECTION.release();

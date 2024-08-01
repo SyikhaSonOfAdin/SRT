@@ -23,7 +23,7 @@ class Company {
         }
     }
 
-    getComapnyCode = async (companyId) => {
+    getCompanyCode = async (companyId) => {
         const CONNECTION = await SRT.getConnection()
         const QUERY = [
             `SELECT CS.${TABLES.COMPANY_SETTINGS.COLUMN.COMPANY_CODE} FROM ${TABLES.COMPANY_SETTINGS.TABLE} AS CS

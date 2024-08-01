@@ -16,6 +16,7 @@ const PATH = {
         },
         REPORT: {
             ADD: require('../APIS/POST/report/add'),
+            ASSIGN: require('../APIS/POST/report/assignedTo'),
             EDIT: require('../APIS/POST/report/edit'),
         }
     }
@@ -30,8 +31,11 @@ const ARRAY_OF_PATHS = {
     ],
     POST: [
         PATH.POST.LOGIN,
+        
         PATH.POST.COMPANY.REGISTRATION,
+
         PATH.POST.REPORT.ADD,
+        PATH.POST.REPORT.ASSIGN,
         PATH.POST.REPORT.EDIT,
     ],
 }
