@@ -1,5 +1,5 @@
+const companyInstance = require('../../../src/modules/company');
 const ENDPOINTS = require('../../../.conf/.conf_endpoints');
-const COMPANY = require('../../../src/modules/company');
 const express = require('express');
 const router = express.Router();
 
@@ -13,7 +13,7 @@ router.post(ENDPOINTS.POST.COMPANY.REGISTRATION, async (req, res) => {
     }
 
     try {
-        await COMPANY.registration(email, password, name)
+        await companyInstance.registration(email, password, name)
         res.status(200).json({
             message: "Check your email for confirmation"
         })

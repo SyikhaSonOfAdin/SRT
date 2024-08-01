@@ -14,7 +14,8 @@ const ENDPOINTS = {
             REGISTRATION: '/company/registration',
         },
         REPORT: {
-            ADD: '/report/add'
+            ADD: '/report/add',
+            EDIT: '/report/edit',
         }
     }
 }

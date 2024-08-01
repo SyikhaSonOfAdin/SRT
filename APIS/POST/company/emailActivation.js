@@ -1,5 +1,5 @@
+const companyInstance = require('../../../src/modules/company');
 const ENDPOINTS = require('../../../.conf/.conf_endpoints');
-const COMPANY = require('../../../src/modules/company');
 const jwt = require('jsonwebtoken');
 const express = require('express');
 const router = express.Router();
@@ -20,7 +20,7 @@ router.get(ENDPOINTS.GET.COMPANY.CONFIRMATION, async (req, res) => {
         }
 
         jwt.verify(token, process.env.SECRET_KEY);
-        await COMPANY.companyActivation(req.params.passId)
+        await companyInstance.companyActivation(req.params.passId)
 
         res.status(200).send("Registration successful")
     } catch (error) {

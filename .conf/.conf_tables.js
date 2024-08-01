@@ -89,6 +89,16 @@ const TABLES = {
             SOLUTIONS: "SOLUTIONS",
         }
     },
+    COMPANY_SETTINGS: {
+        TABLE: "company_settings",
+        COLUMN: {
+            ID: "ID",
+            COMPANY_ID: "COMPANY_ID",
+            INPUT_BY: "INPUT_BY",
+            COMPANY_CODE: "COMPANY_CODE",
+            URL: "URL",
+        }
+    }
 };
 
 

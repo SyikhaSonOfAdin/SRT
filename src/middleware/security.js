@@ -68,16 +68,20 @@ class Security {
 
     try {
       let [result] = await CONNECTION.query(QUERY_COMPANY, PARAMS);
-      
+
       if (result.length > 0) {
         const isMatch = await bcrypt.compare(password, result[0][TABLES.COMPANY.COLUMN.PASSWORD]);
         if (isMatch) {
-          return {
-            cId: this.encrypt(result[0][TABLES.COMPANY.COLUMN.ID]), //Company Id
-            cName: result[0][TABLES.COMPANY.COLUMN.NAME], //Company Name
-            passC: this.encrypt(result[0][TABLES.COMPANY.COLUMN.PASS_ID]), //Company Pass Code
-            jwtToken: jwt.sign({ email: result[0][TABLES.COMPANY.COLUMN.EMAIL] }, process.env.SECRET_KEY, { expiresIn: '1d' })
-          };
+          if (result[0][TABLES.COMPANY.COLUMN.STATUS] == 'ACTIVE') {
+            return {
+              cId: this.encrypt(result[0][TABLES.COMPANY.COLUMN.ID]), //Company Id
+              cName: result[0][TABLES.COMPANY.COLUMN.NAME], //Company Name
+              passC: this.encrypt(result[0][TABLES.COMPANY.COLUMN.PASS_ID]), //Company Pass Code
+              jwtToken: jwt.sign({ email: result[0][TABLES.COMPANY.COLUMN.EMAIL] }, process.env.SECRET_KEY, { expiresIn: '1d' })
+            };
+          } else {
+            throw new Error("Please finish your registration")
+          }
         } else {
           throw new Error("Invalid password")
         }
@@ -109,18 +113,14 @@ class Security {
 
   verifyToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    const token = authHeader
 
     if (!token) {
       return res.status(401).json({ message: 'No token provided' });
     }
 
     jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
-      if (err) {
-        return res.status(403).json({ message: 'Invalid or expired token' });
-      }
-
-      req.user = user;
+      if (err) return res.status(403).json({ message: 'Invalid or expired token' });
       next();
     });
   };

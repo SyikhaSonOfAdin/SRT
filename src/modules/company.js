@@ -7,6 +7,41 @@ const bcrypt = require('bcrypt');
 class Company {
     #security = new Security();
 
+    companyActivation = async (passId) => {
+        const CONNECTION = await SRT.getConnection()
+        const QUERY = [
+            `UPDATE ${TABLES.COMPANY.TABLE} SET ${TABLES.COMPANY.COLUMN.STATUS} = "ACTIVE" WHERE ${TABLES.COMPANY.COLUMN.PASS_ID} = ?`
+        ]
+        const PARAMS = [[passId]]
+
+        try {
+            await CONNECTION.query(QUERY[0], PARAMS[0])
+        } catch (error) {
+            throw error
+        } finally {
+            CONNECTION.release()
+        }
+    }
+
+    getComapnyCode = async (companyId) => {
+        const CONNECTION = await SRT.getConnection()
+        const QUERY = [
+            `SELECT CS.${TABLES.COMPANY_SETTINGS.COLUMN.COMPANY_CODE} FROM ${TABLES.COMPANY_SETTINGS.TABLE} AS CS
+            JOIN ${TABLES.COMPANY.TABLE} AS C ON CS.${TABLES.COMPANY_SETTINGS.COLUMN.COMPANY_ID} = C.${TABLES.COMPANY.COLUMN.ID}
+            WHERE C.${TABLES.COMPANY.COLUMN.ID} = ?`
+        ]
+        const PARAMS = [[companyId]]
+
+        try {
+            const [companyCode] = await CONNECTION.query(QUERY[0], PARAMS[0])
+            return companyCode[0].COMPANY_CODE ? companyCode[0].COMPANY_CODE : null
+        } catch (error) {
+            throw error
+        } finally {
+            CONNECTION.release()
+        }
+    }
+
     registration = async (email, password, name) => {
         const CONNECTION = await SRT.getConnection()
         const QUERY = [
@@ -34,21 +69,7 @@ class Company {
         }
     }
 
-    companyActivation = async (passId) => {
-        const CONNECTION = await SRT.getConnection()
-        const QUERY = [
-            `UPDATE ${TABLES.COMPANY.TABLE} SET ${TABLES.COMPANY.COLUMN.STATUS} = "ACTIVE" WHERE ${TABLES.COMPANY.COLUMN.PASS_ID} = ?`
-        ]
 
-        try {
-            const PARAMS = [[passId]]
-            await CONNECTION.query(QUERY[0], PARAMS[0])
-        } catch (error) {
-            throw error
-        } finally {
-            CONNECTION.release()
-        }
-    }
 }
-const COMPANY = new Company()
-module.exports = COMPANY
+const companyInstance = new Company()
+module.exports = companyInstance

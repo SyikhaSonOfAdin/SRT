@@ -6,7 +6,7 @@ const companyInstance = require('../../../src/modules/company');
 const router = express.Router();
 const queues = new Map();
 
-router.post(ENDPOINTS.POST.REPORT.ADD, async (req, res) => {
+router.post(ENDPOINTS.POST.REPORT.EDIT, async (req, res) => {
     const { companyId, locationId, departmentId, categoryId, inputBy, reportIssued } = req.body;
 
     if (!companyId) {
@@ -25,12 +25,10 @@ router.post(ENDPOINTS.POST.REPORT.ADD, async (req, res) => {
 
     try {
         await queue.add(async () => {
-            await CONNECTION.beginTransaction();
-            const companyCode = await companyInstance.getComapnyCode(companyId);
-            const ticketNo = await reportInstance.generateTicketNo(CONNECTION, companyId, companyCode);
+            await CONNECTION.beginTransaction();            
             await reportInstance.add(CONNECTION, locationId, departmentId, categoryId, ticketNo, inputBy, reportIssued);
             await CONNECTION.commit();
-            res.status(200).json({ message: "Report submited" });
+            res.status(200).json({ message: "Report edited" });
         });
     } catch (error) {
         await CONNECTION.rollback();

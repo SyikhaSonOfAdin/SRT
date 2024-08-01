@@ -1,7 +1,8 @@
-const SRT = require("../../.conf/.conf_database");
 const TABLES = require("../../.conf/.conf_tables");
+const SRT = require("../../.conf/.conf_database");
 
 class Report {
+
     add = async (CONNECTION, locationId, departmentId, categoryId, ticketNo, inputBy, reportIssued) => {
         const QUERY = [
             `INSERT INTO ${TABLES.REPORT.TABLE} (${TABLES.REPORT.COLUMN.LOCATION_ID}, ${TABLES.REPORT.COLUMN.DEPARTMENT_ID}, 
@@ -20,14 +21,41 @@ class Report {
     }
 
     get = async (companyId) => {
+        const CONNECTION = await SRT.getConnection()
+        const QUERY = [`
+            SELECT R.${TABLES.REPORT.COLUMN.TICKET}, R.${TABLES.REPORT.COLUMN.INPUT_BY} AS REPORT_BY, CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.NAME} AS DEPARTMENT,
+            CL.${TABLES.COMPANY_LOCATIONS.COLUMN.NAME} AS LOCATION, DATE_FORMAT(R.${TABLES.REPORT.COLUMN.INPUT_DATE}, '%Y-%m-%d') AS INPUT_DATE,
+            COALESCE(DATE_FORMAT(RD.${TABLES.REPORT_DETAIL.COLUMN.FINISH_DATE}, '%Y-%m-%d'), '-') AS FINISH_DATE, R.${TABLES.REPORT.COLUMN.REPORT_ISSUE} AS REPORT_ISSUE,
+            RD.${TABLES.REPORT_DETAIL.COLUMN.ASSIGNED_USER} AS ASSIGNED_TO, R.${TABLES.REPORT.COLUMN.STATUS} AS STATUS,
+            RD.${TABLES.REPORT_DETAIL.COLUMN.RESULT} AS RESULT,
+            RD.${TABLES.REPORT_DETAIL.COLUMN.PROBLEMS} AS PROBLEM,
+            RD.${TABLES.REPORT_DETAIL.COLUMN.SOLUTIONS} AS SOLUTION
+            FROM ${TABLES.REPORT.TABLE} AS R 
+            LEFT JOIN ${TABLES.REPORT_DETAIL.TABLE} AS RD ON R.${TABLES.REPORT.COLUMN.ID} = RD.${TABLES.REPORT_DETAIL.COLUMN.REPORT_ID}
+            JOIN ${TABLES.COMPANY_DEPARTMENTS.TABLE} AS CD ON R.${TABLES.REPORT.COLUMN.DEPARTMENT_ID} = CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.ID}
+            JOIN ${TABLES.COMPANY_LOCATIONS.TABLE} AS CL ON R.${TABLES.REPORT.COLUMN.LOCATION_ID} = CL.${TABLES.COMPANY_LOCATIONS.COLUMN.ID}
+            JOIN ${TABLES.COMPANY.TABLE} AS C ON CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.COMPANY_ID} = C.${TABLES.COMPANY.COLUMN.ID}
+            WHERE C.${TABLES.COMPANY.COLUMN.ID} = ?
+            `
+        ]
+        const PARAMS = [[companyId]]
 
+        try {
+            const [DATA] = await CONNECTION.query(QUERY[0], PARAMS[0])
+            return DATA
+        } catch (error) {
+            throw error
+        } finally {
+            CONNECTION.release()
+        }
     }
 
-    generateTicketNo = async (CONNECTION, companyId) => {
+    generateTicketNo = async (CONNECTION, companyId, companyCode) => {
         const QUERY = [
             `SELECT R.${TABLES.REPORT.COLUMN.TICKET} FROM ${TABLES.REPORT.TABLE} AS R
             JOIN ${TABLES.COMPANY_DEPARTMENTS.TABLE} AS CD ON R.${TABLES.REPORT.COLUMN.DEPARTMENT_ID} = CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.ID}
             JOIN ${TABLES.COMPANY.TABLE} AS C ON CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.COMPANY_ID} = C.${TABLES.COMPANY.COLUMN.ID}
+            WHERE C.${TABLES.COMPANY.COLUMN.ID} = ?
             ORDER BY R.${TABLES.REPORT.COLUMN.ID} DESC LIMIT 1`
         ]
         const PARAMS = [[companyId]]
@@ -35,7 +63,7 @@ class Report {
         try {
             const [rows] = await CONNECTION.query(QUERY[0], PARAMS[0]);
 
-            let lastTicket = rows.length ? rows[0].ticket : null;
+            let lastTicket = rows.length ? rows[0].TICKET : null;
             let newTicketNumber;
 
             if (lastTicket) {
@@ -45,7 +73,7 @@ class Report {
                 newTicketNumber = 1;
             }
 
-            const ticketNo = `KKH-${String(newTicketNumber).padStart(4, '0')}`;
+            const ticketNo = `${companyCode}-${String(newTicketNumber).padStart(4, '0')}`;
 
             return ticketNo;
         } catch (error) {

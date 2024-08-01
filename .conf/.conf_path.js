@@ -13,6 +13,10 @@ const PATH = {
         LOGIN: require('../APIS/POST/login'),
         COMPANY: {
             REGISTRATION: require('../APIS/POST/company/resgistration'),
+        },
+        REPORT: {
+            ADD: require('../APIS/POST/report/add'),
+            EDIT: require('../APIS/POST/report/edit'),
         }
     }
 }
@@ -27,6 +31,8 @@ const ARRAY_OF_PATHS = {
     POST: [
         PATH.POST.LOGIN,
         PATH.POST.COMPANY.REGISTRATION,
+        PATH.POST.REPORT.ADD,
+        PATH.POST.REPORT.EDIT,
     ],
 }
 

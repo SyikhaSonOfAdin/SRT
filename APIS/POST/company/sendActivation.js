@@ -1,5 +1,4 @@
 const ENDPOINTS = require('../../../.conf/.conf_endpoints');
-const COMPANY = require('../../../src/modules/company');
 const jwt = require('jsonwebtoken');
 const express = require('express');
 const Security = require('../../../src/middleware/security');
