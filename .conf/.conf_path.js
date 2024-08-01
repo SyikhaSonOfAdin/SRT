@@ -4,6 +4,9 @@ const PATH = {
         COMPANY: {
             SEND_ACTIVATION: require('../APIS/POST/company/sendActivation'),
             CONFIRMATION: require('../APIS/POST/company/emailActivation'),
+        },
+        REPORT: {
+            BY_COMPANY_ID: require('../APIS/GET/report/byCompanyId'),
         }
     },
     POST: {
@@ -18,6 +21,8 @@ const ARRAY_OF_PATHS = {
     GET: [
         PATH.GET.COMPANY.SEND_ACTIVATION,
         PATH.GET.COMPANY.CONFIRMATION,
+
+        PATH.GET.REPORT.BY_COMPANY_ID,
     ],
     POST: [
         PATH.POST.LOGIN,
