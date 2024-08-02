@@ -6,7 +6,7 @@ const router = express.Router();
 
 const security = new Security()
 
-router.get(ENDPOINTS.GET.COMPANY.SEND_ACTIVATION, async (req, res) => {
+router.post(ENDPOINTS.POST.COMPANY.SEND_ACTIVATION, async (req, res) => {
     const { email } = req.body
 
     if (!email) {

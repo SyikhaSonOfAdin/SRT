@@ -8,12 +8,9 @@ const queues = new Map();
 
 const security = new Security()
 
-router.post(ENDPOINTS.POST.REPORT.EDIT, security.verifyToken, async (req, res) => {
-    const { companyId, locationId, departmentId, categoryId, reportId } = req.body;
-
-    if (!companyId) {
-        return res.status(400).json({ message: "Invalid parameters" });
-    }
+router.post(ENDPOINTS.POST.REPORT.EDIT, security.verifyToken, security.verifyUser, async (req, res) => {
+    const { locationId, departmentId, categoryId, reportId } = req.body;
+    const companyId = req.body.companyId
 
     const CONNECTION = await SRT.getConnection();
 

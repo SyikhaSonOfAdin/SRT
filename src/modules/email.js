@@ -10,12 +10,13 @@ const transporter = nodemailer.createTransport({
 });
 
 class Email {
-    sendEmail = async (emailTo, subject, text) => {
+    sendEmail = async (emailTo, subject, text, html) => {
         const options = {
             from: process.env.EMAIL_HOST_USER,
             to: emailTo,
             subject: subject,
             text: text,
+            html: html
         };
 
         transporter.sendMail(options, (error, info) => {
@@ -27,4 +28,4 @@ class Email {
 
 const emailServices = new Email()
 
-module.exports = emailServices
+module.exports = { Email, emailServices }

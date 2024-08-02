@@ -1,7 +1,6 @@
 const ENDPOINTS = {
     GET: {
-        COMPANY: {
-            SEND_ACTIVATION: '/company/registration/activation/send',
+        COMPANY: {            
             CONFIRMATION: '/company/registration/c/:passId',
         },
         REPORT: {
@@ -11,10 +10,12 @@ const ENDPOINTS = {
     POST: {
         LOGIN: '/login',
         COMPANY: {
+            SEND_ACTIVATION: '/company/registration/activation/send',
             REGISTRATION: '/company/registration',
         },
         REPORT: {
             ADD: '/report/add',
+            ADD_DETAIL: '/report/add_detail',
             ASSIGN: '/report/assign',
             EDIT: '/report/edit',
         }

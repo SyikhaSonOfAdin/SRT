@@ -94,9 +94,9 @@ class Report {
         }
     }
 
-    updateStatus = async (CONNECTION, reportId) => {
-        const QUERY = [`UPDATE ${TABLES.REPORT.TABLE} SET ${TABLES.REPORT.COLUMN.STATUS} = "IN PROGRESS" WHERE ${TABLES.REPORT.COLUMN.ID} = ?`]
-        const PARAMS = [[reportId]]
+    updateStatus = async (CONNECTION, status, reportId) => {
+        const QUERY = [`UPDATE ${TABLES.REPORT.TABLE} SET ${TABLES.REPORT.COLUMN.STATUS} = ? WHERE ${TABLES.REPORT.COLUMN.ID} = ?`]
+        const PARAMS = [[status, reportId]]
         try {
             await CONNECTION.query(QUERY[0], PARAMS[0])
         } catch (error) {

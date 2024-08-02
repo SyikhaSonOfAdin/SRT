@@ -1,6 +1,6 @@
+const { emailServices } = require("../modules/email");
 const TABLES = require("../../.conf/.conf_tables")
 const SRT = require("../../.conf/.conf_database")
-const emailServices = require("../modules/email");
 const CryptoJS = require('crypto-js');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
@@ -124,6 +124,44 @@ class Security {
       next();
     });
   };
+
+  verifyUser = async (req, res, next) => {
+    const { companyId, userId } = req.body
+
+    if (!companyId || !userId) return res.status(400).json({ message: "Invalid parameters" });
+    
+    const decryptedCompanyId = this.decrypt(companyId)
+    const decryptedUserId = this.decrypt(userId)
+    
+    if (!decryptedCompanyId || !decryptedUserId) return res.status(400).json({ message: "Invalid parameters" });
+
+    const CONNECTION = await SRT.getConnection()
+
+    const QUERY = [
+      `SELECT 1 FROM ${TABLES.USER.TABLE} AS U 
+      WHERE U.${TABLES.USER.COLUMN.ID} = ? AND U.${TABLES.USER.COLUMN.COMPANY_ID} = ?`
+    ]
+    const PARAMS = [[decryptedCompanyId, userId]]
+    try {
+      const [USER] = await CONNECTION.query(QUERY[0], PARAMS[0])
+      
+      if (USER.length) {
+        req.body.companyId = decryptedCompanyId
+        req.body.userId = decryptedUserId
+        next()
+      } else {
+        res.status(403).json({
+          message: "Forbidden to access this resource"
+        })
+      }
+    } catch (error) {
+      res.status(500).json({
+        message: error.message,
+      })
+    } finally {
+      CONNECTION.release()
+    }
+  }
 }
 
 module.exports = Security

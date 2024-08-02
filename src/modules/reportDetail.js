@@ -29,6 +29,24 @@ class ReportDetail extends Report {
             throw error
         }
     }
+
+    addDetail = async (CONNECTION, result, problem, solution, finishDate, reportId) => {
+        const QUERY = [`
+            UPDATE ${TABLES.REPORT_DETAIL.TABLE} 
+            SET ${TABLES.REPORT_DETAIL.COLUMN.RESULT} = ?, 
+            ${TABLES.REPORT_DETAIL.COLUMN.PROBLEMS} = ?, 
+            ${TABLES.REPORT_DETAIL.COLUMN.SOLUTIONS} = ?,
+            ${TABLES.REPORT_DETAIL.COLUMN.FINISH_DATE} = ?
+            WHERE ${TABLES.REPORT_DETAIL.COLUMN.REPORT_ID} = ?`
+        ]
+        const PARAMS = [[result, problem, solution, finishDate, reportId]]
+
+        try {
+            await CONNECTION.query(QUERY[0], PARAMS[0])
+        } catch (error) {
+            throw error
+        }
+    }
 }
 
 const reportDetailInstance = new ReportDetail()
