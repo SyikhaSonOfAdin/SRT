@@ -1,4 +1,4 @@
-const { reportInstance } = require('../../../src/modules/report');
+const { departmentInstance } = require('../../../src/modules/department');
 const Security = require('../../../src/middleware/security');
 const ENDPOINTS = require('../../../.conf/.conf_endpoints');
 const express = require('express');
@@ -6,7 +6,7 @@ const router = express.Router();
 
 const security = new Security()
 
-router.get(ENDPOINTS.GET.REPORT.BY_COMPANY_ID, security.verifyToken, async (req, res) => {
+router.get(ENDPOINTS.GET.DEPARTMENTS.BY_COMPANY_ID, security.verifyToken, async (req, res) => {
     const companyId = security.decrypt(req.params.companyId)
 
     if (!companyId) {
@@ -16,7 +16,7 @@ router.get(ENDPOINTS.GET.REPORT.BY_COMPANY_ID, security.verifyToken, async (req,
     }
 
     try {
-        const DATA = await reportInstance.get(companyId)
+        const DATA = await departmentInstance.get(companyId)
         res.status(200).json({
             data: DATA
         })

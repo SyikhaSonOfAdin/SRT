@@ -11,7 +11,7 @@ router.post(ENDPOINTS.POST.LOGIN, async (req, res) => {
     try {
         const users = await security.login(email, password)
         
-        res.status(200).json(users)
+        users.status === false ? res.status(403).json({message : users.message}) : res.status(200).json(users)
     } catch (error) {
         res.status(500).json({
             message: error.message

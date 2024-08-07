@@ -6,17 +6,15 @@ const router = express.Router();
 
 const security = new Security()
 
-router.post(ENDPOINTS.POST.LIST_EMAIL.ADD, security.verifyToken, security.verifyUser, async (req, res) => {
-    const { email } = req.body
-    const companyId = req.body.companyId
-    const userId = req.body.userId
+router.post(ENDPOINTS.POST.LIST_EMAIL.DELETE, security.verifyToken, security.verifyUser, async (req, res) => {
+    const { emailId } = req.body
 
-    if (!email) return res.status(403).json({ message: "Invalid parameters" })
-    
+    if (!emailId) return res.status(403).json({ message: "Invalid parameters" })
+
     try {
-        await listEmailInstance.add(companyId, email, userId)
+        await listEmailInstance.delete(emailId)
         res.status(200).json({
-            message: "Email added successfully"
+            message: "Email deleted successfully"
         })
     } catch (error) {
         res.status(500).json({

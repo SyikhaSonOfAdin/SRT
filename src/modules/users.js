@@ -7,30 +7,55 @@ const bcrypt = require('bcrypt');
 class Users {
     #security = new Security();
 
-    registration = async (email, password, name) => {
-        const CONNECTION = await SRT.getConnection()
+    add = async (CONNECTION, companyId, email, username, password, level) => {
         const QUERY = [
-            `INSERT INTO ${TABLES.COMPANY.TABLE} 
-            (${TABLES.COMPANY.COLUMN.EMAIL}, ${TABLES.COMPANY.COLUMN.PASSWORD}, ${TABLES.COMPANY.COLUMN.NAME}, ${TABLES.COMPANY.COLUMN.PASS_ID})
-            VALUES (?,?,?,?)`
+            `INSERT INTO ${TABLES.USER.TABLE} (${TABLES.USER.COLUMN.COMPANY_ID}, ${TABLES.USER.COLUMN.EMAIL}, ${TABLES.USER.COLUMN.USERNAME}, ${TABLES.USER.COLUMN.PASSWORD}, ${TABLES.USER.COLUMN.LEVEL})
+            VALUES (?,?,?,?,?)`
         ]
+        const PASSWORD = await bcrypt.hash(password, 13)
+        const PARAMS = [[companyId, email, username, PASSWORD, level]]
 
         try {
-            const isEmailExist = await this.#security.isEmailExist(email)
-            if (!isEmailExist) {
-                const PASS_ID = uuidv4()
-                const PASSWORD = await bcrypt.hash(password, 13)
-                const PARAMS = [[email, PASSWORD, name, PASS_ID]]
-                await CONNECTION.query(QUERY[0], PARAMS[0])
+            await CONNECTION.query(QUERY[0], PARAMS[0])
+        } catch (error) {
+            throw error
+        }
+    }    
+
+    edit = async (CONNECTION, email, username, password, level, userId) => {
+        const QUERY = [
+            `UPDATE ${TABLES.USER.TABLE} SET ${TABLES.USER.COLUMN.EMAIL} = ?, ${TABLES.USER.COLUMN.USERNAME} = ?, ${TABLES.USER.COLUMN.PASSWORD} = ?, ${TABLES.USER.COLUMN.LEVEL} = ?
+            WHERE ${TABLES.USER.COLUMN.ID} = ?`
+        ]
+        const PASSWORD = await bcrypt.hash(password, 13)
+        const PARAMS = [[email, username, PASSWORD, level, userId]]
+
+        try {
+            await CONNECTION.query(QUERY[0], PARAMS[0])
+        } catch (error) {
+            throw error
+        }
+    }
+
+    isEmailExist = async (CONNECTION, email) => {
+        const QUERY = [`SELECT ${TABLES.USER.COLUMN.EMAIL} FROM ${TABLES.USER.TABLE} WHERE ${TABLES.USER.COLUMN.EMAIL} = ?`]
+        const PARAMS = [[email]]
+
+        try {
+            const [result] = await CONNECTION.query(QUERY[0], PARAMS[0])
+            if (result.length > 0) {
+                return true
             } else {
-                throw new Error("Email is already exists!")
+                return false
             }
         } catch (error) {
             throw error
-        } finally {
-            CONNECTION.release()
         }
     }
 }
 
-module.exports = Users
+const userInstance = new Users()
+module.exports = {
+    Users,
+    userInstance
+}

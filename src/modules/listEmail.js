@@ -4,13 +4,41 @@ const { Email } = require("./email");
 
 class ListEmail extends Email {
 
-    add = async (companyId, email) => {
+    add = async (companyId, email, userId) => {
         const CONNECTION = await SRT.getConnection()
         const QUERY = [
-            `INSERT INTO ${TABLES.LIST_EMAIL.TABLE} (${TABLES.LIST_EMAIL.COLUMN.EMAIL}, ${TABLES.LIST_EMAIL.COLUMN.COMPANY_ID})
-            VALUES (?,?)`
+            `INSERT INTO ${TABLES.LIST_EMAIL.TABLE} (${TABLES.LIST_EMAIL.COLUMN.EMAIL}, ${TABLES.LIST_EMAIL.COLUMN.COMPANY_ID}, ${TABLES.LIST_EMAIL.COLUMN.INPUT_BY})
+            VALUES (?,?,?)`
         ]
-        const PARAMS = [[email, companyId]]
+        const PARAMS = [[email, companyId, userId]]
+
+        try {
+            await CONNECTION.query(QUERY[0], PARAMS[0])
+        } catch (error) {
+            throw error
+        }
+    }
+
+    delete = async (emailId) => {
+        const CONNECTION = await SRT.getConnection()
+        const QUERY = [
+            `DELETE FROM ${TABLES.LIST_EMAIL.TABLE} WHERE ${TABLES.LIST_EMAIL.COLUMN.ID} = ?`
+        ]
+        const PARAMS = [[emailId]]
+
+        try {
+            await CONNECTION.query(QUERY[0], PARAMS[0])
+        } catch (error) {
+            throw error
+        }
+    }
+
+    edit = async (email, emailId) => {
+        const CONNECTION = await SRT.getConnection()
+        const QUERY = [
+            `UPDATE ${TABLES.LIST_EMAIL.TABLE} SET ${TABLES.LIST_EMAIL.COLUMN.EMAIL} = ? WHERE ${TABLES.LIST_EMAIL.COLUMN.ID} = ?`
+        ]
+        const PARAMS = [[email, emailId]]
 
         try {
             await CONNECTION.query(QUERY[0], PARAMS[0])

@@ -3,6 +3,7 @@ const TABLES = require("../../.conf/.conf_tables");
 const Security = require("../middleware/security")
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
+const { userInstance } = require("./users");
 
 class Company {
     #security = new Security();
@@ -56,13 +57,19 @@ class Company {
                 const PASS_ID = uuidv4()
                 const PASSWORD = await bcrypt.hash(password, 13)
                 const PARAMS = [[email, PASSWORD, name, PASS_ID]]
+                await CONNECTION.beginTransaction()
+                const [result] = await CONNECTION.query(QUERY[0], PARAMS[0])
+                const lastInsertId = result.insertId;
 
-                await CONNECTION.query(QUERY[0], PARAMS[0])
+                await userInstance.add(CONNECTION, lastInsertId, email, name, password, 3);
+                await CONNECTION.commit()
+
                 await this.#security.EmailActivation(email)
             } else {
                 throw new Error("Email already exists!")
             }
         } catch (error) {
+            CONNECTION.rollback()
             throw error
         } finally {
             CONNECTION.release()

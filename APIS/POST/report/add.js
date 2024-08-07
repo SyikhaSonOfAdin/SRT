@@ -10,29 +10,34 @@ const queues = new Map();
 
 const security = new Security()
 
-router.post(ENDPOINTS.POST.REPORT.ADD, security.verifyToken, security.verifyUser, async (req, res) => {
-    const { locationId, departmentId, categoryId, inputBy, reportIssued } = req.body;
-    const companyId = req.body.companyId
+router.post(ENDPOINTS.POST.REPORT.ADD, security.verifyToken, async (req, res) => {
+    const { companyId, locationId, departmentId, categoryId, inputBy, reportIssued } = req.body;
+
+    if (!companyId) return res.status(400).json({ message: 'Invalid parameters' })
+
+    const decryptedCompanyId = security.decrypt(companyId)
     
+    if (!decryptedCompanyId) return res.status(400).json({ message: 'Invalid parameters' })
+
     const CONNECTION = await SRT.getConnection();
 
     const { default: PQueue } = await import('p-queue');
 
-    if (!queues.has(companyId)) {
-        queues.set(companyId, new PQueue({ concurrency: 1 }));
+    if (!queues.has(decryptedCompanyId)) {
+        queues.set(decryptedCompanyId, new PQueue({ concurrency: 1 }));
     }
 
-    const queue = queues.get(companyId);
+    const queue = queues.get(decryptedCompanyId);
 
     await queue.add(async () => {
         try {
             await CONNECTION.beginTransaction();
 
             const today = new Date().toISOString().split('T')[0];
-            const companyCode = await companyInstance.getCompanyCode(companyId);
-            const ticketNo = await reportInstance.generateTicketNo(CONNECTION, companyId, companyCode);
+            const companyCode = await companyInstance.getCompanyCode(decryptedCompanyId);
+            const ticketNo = await reportInstance.generateTicketNo(CONNECTION, decryptedCompanyId, companyCode);
             await reportInstance.add(CONNECTION, locationId, departmentId, categoryId, ticketNo, inputBy, reportIssued);
-            const listEmail = await listEmailInstance.getEmails(CONNECTION, companyId)
+            const listEmail = await listEmailInstance.getEmails(CONNECTION, decryptedCompanyId)
 
             await listEmailInstance.notify(listEmail, "New Report!", "", `<h3>Ticket No : ${ticketNo}<br>By ${inputBy}<br>${today}</h3><p>${reportIssued}</p>`);
 
