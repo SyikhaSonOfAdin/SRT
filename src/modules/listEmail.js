@@ -4,8 +4,7 @@ const { Email } = require("./email");
 
 class ListEmail extends Email {
 
-    add = async (companyId, email, userId) => {
-        const CONNECTION = await SRT.getConnection()
+    add = async (CONNECTION, companyId, email, userId) => {
         const QUERY = [
             `INSERT INTO ${TABLES.LIST_EMAIL.TABLE} (${TABLES.LIST_EMAIL.COLUMN.EMAIL}, ${TABLES.LIST_EMAIL.COLUMN.COMPANY_ID}, ${TABLES.LIST_EMAIL.COLUMN.INPUT_BY})
             VALUES (?,?,?)`
@@ -42,6 +41,23 @@ class ListEmail extends Email {
 
         try {
             await CONNECTION.query(QUERY[0], PARAMS[0])
+        } catch (error) {
+            throw error
+        }
+    }
+
+    get = async (CONNECTION, companyId) => {
+        const QUERY = [
+            `SELECT LE.${TABLES.LIST_EMAIL.COLUMN.ID}, LE.${TABLES.LIST_EMAIL.COLUMN.EMAIL}, DATE_FORMAT(LE.${TABLES.LIST_EMAIL.COLUMN.INPUT_DATE}, '%Y-%m-%d') AS INPUT_DATE,
+            U.${TABLES.USER.COLUMN.USERNAME} AS INPUT_BY
+            FROM ${TABLES.LIST_EMAIL.TABLE} AS LE JOIN ${TABLES.USER.TABLE} AS U ON LE.${TABLES.LIST_EMAIL.COLUMN.INPUT_BY} = U.${TABLES.USER.COLUMN.ID}
+            WHERE LE.${TABLES.LIST_EMAIL.COLUMN.COMPANY_ID} = ? `
+        ]
+        const PARAMS = [[companyId]]
+
+        try {
+            const [result] = await CONNECTION.query(QUERY[0], PARAMS[0])
+            return result
         } catch (error) {
             throw error
         }

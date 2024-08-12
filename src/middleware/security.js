@@ -63,7 +63,7 @@ class Security {
   login = async (email, password) => {
     const CONNECTION = await SRT.getConnection();
     const QUERY_COMPANY = `SELECT * FROM ${TABLES.COMPANY.TABLE} WHERE ${TABLES.COMPANY.COLUMN.EMAIL} = ?`;
-    const QUERY_USER = `SELECT * FROM ${TABLES.USER.TABLE} WHERE ${TABLES.USER.COLUMN.EMAIL} = ?`;
+    const QUERY_USER = `SELECT U.*, C.${TABLES.COMPANY.COLUMN.NAME} FROM ${TABLES.USER.TABLE} AS U JOIN ${TABLES.COMPANY.TABLE} AS C ON U.${TABLES.USER.COLUMN.COMPANY_ID} = C.${TABLES.COMPANY.COLUMN.ID} WHERE U.${TABLES.USER.COLUMN.EMAIL} = ?`;
     const PARAMS = [email];
 
     try {
@@ -94,25 +94,6 @@ class Security {
         } else {
           throw new Error("Invalid password");
         }
-      } else if (companyResult.length > 0) {
-        // Email found only in company table
-        const company = companyResult[0];
-        const isMatch = await bcrypt.compare(password, company[TABLES.COMPANY.COLUMN.PASSWORD]);
-
-        if (isMatch) {
-          if (company[TABLES.COMPANY.COLUMN.STATUS] == 'ACTIVE') {
-            return {
-              cId: this.encrypt(company[TABLES.COMPANY.COLUMN.ID]), // Company Id
-              cName: company[TABLES.COMPANY.COLUMN.NAME], // Company Name
-              passC: this.encrypt(company[TABLES.COMPANY.COLUMN.PASS_ID]), // Company Pass Code
-              jwtToken: jwt.sign({ email: company[TABLES.COMPANY.COLUMN.EMAIL] }, process.env.SECRET_KEY, { expiresIn: '1d' })
-            };
-          } else {
-            throw new Error("Please finish your registration");
-          }
-        } else {
-          throw new Error("Invalid password");
-        }
       } else if (userResult.length > 0) {
         // Email found only in user table
         const user = userResult[0];
@@ -121,6 +102,7 @@ class Security {
         if (isMatch) {
           return {
             cId: this.encrypt(user[TABLES.USER.COLUMN.COMPANY_ID]), // Users Company Id
+            cName: user[TABLES.COMPANY.COLUMN.NAME], // Users Company Id
             uId: this.encrypt(user[TABLES.USER.COLUMN.ID]), // User Id
             uName: user[TABLES.USER.COLUMN.USERNAME], // User Name
             jwtToken: jwt.sign({ email: user[TABLES.USER.COLUMN.EMAIL] }, process.env.SECRET_KEY, { expiresIn: '1d' })
@@ -137,7 +119,6 @@ class Security {
       CONNECTION.release();
     }
   };
-
 
   verifyToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];

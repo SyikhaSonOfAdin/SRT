@@ -12,9 +12,9 @@ const security = new Security();
 router.post(ENDPOINTS.POST.REPORT.ADD_DETAIL, security.verifyToken, security.verifyUser, async (req, res) => {
     const { reportId, status, finishDate, result, problem, solution } = req.body;
     const companyId = req.body.companyId
-
-    if (!finishDate || !status) {
-        return res.status(400).json({ message: "Invalid parameters, try again!" });
+    
+    if (!reportId || !finishDate || !status) {
+        return res.status(400).json({ message: "Invalid parameters" });
     }
 
     const CONNECTION = await SRT.getConnection();

@@ -4,16 +4,26 @@ const PATH = {
             CONFIRMATION: require('../APIS/POST/company/emailActivation'),
         },
         CATEGORY: {
-            BY_COMPANY_ID: '/category/add',
+            BY_COMPANY_ID: require('../APIS/GET/category/byCompanyId'),
         },
         DEPARTMENTS: {
             BY_COMPANY_ID: require('../APIS/GET/departments/byCompanyId'),
+        },
+        USER: {
+            BY_COMPANY_ID: require('../APIS/GET/user/byCompanyId'),
+        },
+        LIST_EMAIL: {
+            BY_COMPANY_ID: require('../APIS/GET/listEmail/byCompanyId'),
         },
         LOCATIONS: {
             BY_COMPANY_ID: require('../APIS/GET/locations/byCompanyId'),
         },
         REPORT: {
             BY_COMPANY_ID: require('../APIS/GET/report/byCompanyId'),
+            DOWNLOAD: require('../APIS/GET/report/downloadByCompanyId'),
+        },
+        SETTINGS: {
+            BY_COMPANY_ID: require('../APIS/GET/companySettings/byCompanyId'),
         }
     },
     POST: {
@@ -46,11 +56,15 @@ const PATH = {
         USER: {
             ADD: require('../APIS/POST/user/add'),
             EDIT: require('../APIS/POST/user/edit'),
+            DELETE: require('../APIS/POST/user/delete'),
         },
         LIST_EMAIL: {
             ADD: require('../APIS/POST/listEmail/add'),
             EDIT: require('../APIS/POST/listEmail/edit'),
             DELETE: require('../APIS/POST/listEmail/delete'),
+        },
+        SETTINGS: {
+            CONFIG: require('../APIS/POST/companySettings/add'),
         }
     }
 }
@@ -59,11 +73,20 @@ const ARRAY_OF_PATHS = {
     GET: [
         PATH.GET.COMPANY.CONFIRMATION,
 
+        PATH.GET.CATEGORY.BY_COMPANY_ID,
+
         PATH.GET.DEPARTMENTS.BY_COMPANY_ID,
+
+        PATH.GET.USER.BY_COMPANY_ID,
+
+        PATH.GET.LIST_EMAIL.BY_COMPANY_ID,
 
         PATH.GET.LOCATIONS.BY_COMPANY_ID,
 
         PATH.GET.REPORT.BY_COMPANY_ID,
+        PATH.GET.REPORT.DOWNLOAD,
+
+        PATH.GET.SETTINGS.BY_COMPANY_ID,
     ],
     POST: [
         PATH.POST.LOGIN,
@@ -90,10 +113,13 @@ const ARRAY_OF_PATHS = {
 
         PATH.POST.USER.ADD,
         PATH.POST.USER.EDIT,
+        PATH.POST.USER.DELETE,
 
         PATH.POST.LIST_EMAIL.ADD,
         PATH.POST.LIST_EMAIL.DELETE,
         PATH.POST.LIST_EMAIL.EDIT,
+
+        PATH.POST.SETTINGS.CONFIG,
     ],
 }
 

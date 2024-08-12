@@ -9,11 +9,21 @@ const ENDPOINTS = {
         DEPARTMENTS: {
             BY_COMPANY_ID: '/departments/:companyId'
         },
+        USER: {
+            BY_COMPANY_ID: '/user/:companyId'
+        },
+        LIST_EMAIL: {
+            BY_COMPANY_ID: '/email/:companyId'
+        },
         LOCATIONS: {
             BY_COMPANY_ID: '/locations/:companyId'
         },
         REPORT: {
-            BY_COMPANY_ID: '/report/:companyId'
+            BY_COMPANY_ID: '/report/:companyId',
+            DOWNLOAD: '/report/:companyId/download',
+        },
+        SETTINGS: {
+            BY_COMPANY_ID: '/settings/:companyId'
         }
     },
     POST: {
@@ -37,6 +47,7 @@ const ENDPOINTS = {
             ADD_BY_COMPANY: '/user/bc/add',
             EDIT: '/user/edit',
             EDIT_BY_COMPANY: '/user/bc/edit',
+            DELETE: '/user/delete',
         },
         LIST_EMAIL: {
             ADD: '/list_email/add',
@@ -54,6 +65,9 @@ const ENDPOINTS = {
             ASSIGN: '/report/assign',
             EDIT: '/report/edit',
         },
+        SETTINGS: {
+            CONFIG: '/settings/config',
+        }
     }
 }
 

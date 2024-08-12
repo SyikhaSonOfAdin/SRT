@@ -2,8 +2,7 @@ const TABLES = require("../../.conf/.conf_tables")
 const SRT = require("../../.conf/.conf_database")
 
 class Category {
-    add = async (companyId, userId, name) => {
-        const CONNECTION = await SRT.getConnection()
+    add = async (CONNECTION, companyId, userId, name) => {
         const QUERY = [
             `INSERT INTO ${TABLES.LIST_CATEGORY.TABLE} (${TABLES.LIST_CATEGORY.COLUMN.COMPANY_ID}, ${TABLES.LIST_CATEGORY.COLUMN.INPUT_BY}, ${TABLES.LIST_CATEGORY.COLUMN.NAME})
             VALUES (?,?,?)`
@@ -14,8 +13,6 @@ class Category {
             await CONNECTION.query(QUERY[0], PARAMS[0])
         } catch (error) {
             throw error
-        } finally {
-            CONNECTION.release()
         }
     }
 
@@ -51,8 +48,7 @@ class Category {
         }
     }
 
-    get = async (companyId) => {
-        const CONNECTION = await SRT.getConnection()
+    get = async (CONNECTION, companyId) => {
         const QUERY = [
             `SELECT LC.${TABLES.LIST_CATEGORY.COLUMN.ID}, LC.${TABLES.LIST_CATEGORY.COLUMN.NAME}, DATE_FORMAT(LC.${TABLES.LIST_CATEGORY.COLUMN.INPUT_DATE}, '%Y-%m-%d') AS INPUT_DATE,
             U.${TABLES.USER.COLUMN.USERNAME} AS INPUT_BY
@@ -66,8 +62,6 @@ class Category {
             return result
         } catch (error) {
             throw error
-        } finally {
-            CONNECTION.release()
         }
     }
 }

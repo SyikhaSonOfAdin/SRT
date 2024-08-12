@@ -37,6 +37,34 @@ class Users {
         }
     }
 
+    delete = async (CONNECTION, userId) => {
+        const QUERY = [
+            `DELETE FROM ${TABLES.USER.TABLE} WHERE ${TABLES.USER.COLUMN.ID} = ?`
+        ]
+        const PARAMS = [[userId]]
+
+        try {
+            await CONNECTION.query(QUERY[0], PARAMS[0])
+        } catch (error) {
+            throw error
+        }
+    }    
+
+    get = async (CONNECTION, companyId) => {
+        const QUERY = [
+            `SELECT U.${TABLES.USER.COLUMN.ID}, U.${TABLES.USER.COLUMN.EMAIL}, U.${TABLES.USER.COLUMN.USERNAME}, DATE_FORMAT(U.${TABLES.USER.COLUMN.SINCE}, '%Y-%m-%d') AS SINCE, U.${TABLES.USER.COLUMN.LEVEL} 
+            FROM ${TABLES.USER.TABLE} AS U WHERE U.${TABLES.USER.COLUMN.COMPANY_ID} = ?`
+        ]
+        const PARAMS = [[companyId]]
+
+        try {
+            const [result] = await CONNECTION.query(QUERY[0], PARAMS[0])
+            return result
+        } catch (error) {
+            throw error
+        }
+    }
+
     isEmailExist = async (CONNECTION, email) => {
         const QUERY = [`SELECT ${TABLES.USER.COLUMN.EMAIL} FROM ${TABLES.USER.TABLE} WHERE ${TABLES.USER.COLUMN.EMAIL} = ?`]
         const PARAMS = [[email]]

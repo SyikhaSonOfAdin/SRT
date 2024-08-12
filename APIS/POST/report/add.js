@@ -15,9 +15,15 @@ router.post(ENDPOINTS.POST.REPORT.ADD, security.verifyToken, async (req, res) =>
 
     if (!companyId) return res.status(400).json({ message: 'Invalid parameters' })
 
-    const decryptedCompanyId = security.decrypt(companyId)
+    let decryptedCompanyId 
+    try {
+        decryptedCompanyId = security.decrypt(companyId)
+        if (!decryptedCompanyId) return res.status(400).json({ message: 'Invalid companyId' })
+    } catch (error) {
+        console.log('Decryption error:', error.message);
+        return res.status(500).json({ message: error.message });
+    }
     
-    if (!decryptedCompanyId) return res.status(400).json({ message: 'Invalid parameters' })
 
     const CONNECTION = await SRT.getConnection();
 
@@ -39,10 +45,10 @@ router.post(ENDPOINTS.POST.REPORT.ADD, security.verifyToken, async (req, res) =>
             await reportInstance.add(CONNECTION, locationId, departmentId, categoryId, ticketNo, inputBy, reportIssued);
             const listEmail = await listEmailInstance.getEmails(CONNECTION, decryptedCompanyId)
 
-            await listEmailInstance.notify(listEmail, "New Report!", "", `<h3>Ticket No : ${ticketNo}<br>By ${inputBy}<br>${today}</h3><p>${reportIssued}</p>`);
+            await listEmailInstance.notify(listEmail, `New Report! ${ticketNo}`, "", `<p><b>Ticket</b> : ${ticketNo}<br><b>Date</b> : ${today}<br><b>By</b> : ${inputBy}</p><p><b>Message</b> :<br>${reportIssued}</p>`);
 
             await CONNECTION.commit();
-            res.status(200).json({ message: `Report submitted`, ticket: ticketNo });
+            res.status(200).json({ message: `Report ${ticketNo} submitted` });
         } catch (error) {
             await CONNECTION.rollback();
             res.status(500).json({ message: error.message });
