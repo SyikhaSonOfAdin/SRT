@@ -8,19 +8,22 @@ class Users {
     #security = new Security();
 
     add = async (CONNECTION, companyId, email, username, password, level) => {
-        const QUERY = [
-            `INSERT INTO ${TABLES.USER.TABLE} (${TABLES.USER.COLUMN.COMPANY_ID}, ${TABLES.USER.COLUMN.EMAIL}, ${TABLES.USER.COLUMN.USERNAME}, ${TABLES.USER.COLUMN.PASSWORD}, ${TABLES.USER.COLUMN.LEVEL})
-            VALUES (?,?,?,?,?)`
-        ]
-        const PASSWORD = await bcrypt.hash(password, 13)
-        const PARAMS = [[companyId, email, username, PASSWORD, level]]
+        const QUERY = `
+            INSERT INTO ${TABLES.USER.TABLE} 
+            (${TABLES.USER.COLUMN.COMPANY_ID}, ${TABLES.USER.COLUMN.EMAIL}, ${TABLES.USER.COLUMN.USERNAME}, ${TABLES.USER.COLUMN.PASSWORD}, ${TABLES.USER.COLUMN.LEVEL})
+            VALUES (?, ?, ?, ?, ?)
+        `;
+        const PASSWORD_HASH = await bcrypt.hash(password, 13);
+        const PARAMS = [companyId, email, username, PASSWORD_HASH, level];
 
         try {
-            await CONNECTION.query(QUERY[0], PARAMS[0])
+            const [result] = await CONNECTION.query(QUERY, PARAMS);
+            return result.insertId; // Mengembalikan ID dari user yang baru ditambahkan
         } catch (error) {
-            throw error
+            console.error("Error inserting new user:", error);
+            throw new Error("Failed to add new user. Please try again.");
         }
-    }    
+    };
 
     edit = async (CONNECTION, email, username, password, level, userId) => {
         const QUERY = [
@@ -48,7 +51,7 @@ class Users {
         } catch (error) {
             throw error
         }
-    }    
+    }
 
     get = async (CONNECTION, companyId) => {
         const QUERY = [

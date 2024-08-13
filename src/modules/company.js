@@ -4,6 +4,7 @@ const Security = require("../middleware/security")
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
 const { userInstance } = require("./users");
+const { privilegesInstance } = require("./privileges");
 
 class Company {
     #security = new Security();
@@ -43,7 +44,7 @@ class Company {
         }
     }
 
-    registration = async (email, password, name) => {
+    registration = async (email, password, name, privileges) => {
         const CONNECTION = await SRT.getConnection()
         const QUERY = [
             `INSERT INTO ${TABLES.COMPANY.TABLE} 
@@ -61,7 +62,8 @@ class Company {
                 const [result] = await CONNECTION.query(QUERY[0], PARAMS[0])
                 const lastInsertId = result.insertId;
 
-                await userInstance.add(CONNECTION, lastInsertId, email, name, password, 3);
+                const userId = await userInstance.add(CONNECTION, lastInsertId, email, name, password, 3);
+                await privilegesInstance.add(CONNECTION, userId, privileges)
                 await this.#security.EmailActivationLink(email, PASS_ID)
                 await CONNECTION.commit()
 

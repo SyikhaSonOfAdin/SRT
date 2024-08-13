@@ -59,6 +59,9 @@ const ENDPOINTS = {
             DELETE: '/locations/delete',
             EDIT: '/locations/edit',
         },
+        PRIVILEGES: {
+            ADD: '/privileges/add',
+        },
         REPORT: {
             ADD: '/report/add',
             ADD_DETAIL: '/report/add_detail',

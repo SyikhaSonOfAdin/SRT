@@ -4,16 +4,16 @@ const express = require('express');
 const router = express.Router();
 
 router.post(ENDPOINTS.POST.COMPANY.REGISTRATION, async (req, res) => {
-    const { email, password, name } = req.body;
+    const { email, password, name, privileges } = req.body;
 
-    if (!email || !password) {
-        res.status(400).json({
+    if (!email || !password || !name || !privileges) {
+        return res.status(400).json({
             message: "Invalid parameters"
         })
     }
 
     try {
-        await companyInstance.registration(email, password, name)
+        await companyInstance.registration(email, password, name, privileges)
         res.status(200).json({
             message: "Check your email for confirmation"
         })
