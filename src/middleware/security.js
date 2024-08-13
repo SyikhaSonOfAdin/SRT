@@ -17,6 +17,19 @@ class Security {
     return CryptoJS.AES.encrypt(text, process.env.SECRET_KEY).toString();
   };
 
+  EmailActivationLink = async (email, passId) => {
+    try {
+      const token = jwt.sign({ email }, process.env.SECRET_KEY, { expiresIn: '5m' });
+      const currentTime = new Date();
+      const expirationTime = new Date(currentTime.getTime() + 5 * 60000);
+      const formattedExpirationTime = `${expirationTime.getHours()}:${expirationTime.getMinutes().toString().padStart(2, '0')}`;
+
+      await emailServices.sendEmail(email, "Syikha Report Ticketing Email Activation", `Klik this link to finish registration :\n\n${process.env.URL}/api/get/company/registration/c/${passId}?token=${token} \n\nThis link will be valid until ${formattedExpirationTime}`)
+    } catch (error) {
+      throw error
+    }
+  }
+
   EmailActivation = async (email) => {
     const CONNECTION = await SRT.getConnection()
     const QUERY = [`SELECT ${TABLES.COMPANY.COLUMN.PASS_ID} FROM ${TABLES.COMPANY.TABLE} WHERE ${TABLES.COMPANY.COLUMN.EMAIL} = ?`]

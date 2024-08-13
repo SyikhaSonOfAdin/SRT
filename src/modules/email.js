@@ -19,10 +19,14 @@ class Email {
             html: html
         };
 
-        transporter.sendMail(options, (error, info) => {
-            if (error) throw error
-            return info
-        });
+        try {
+            // Menggunakan Promise untuk menunggu hasil sendMail
+            const info = await transporter.sendMail(options);
+            return info;
+        } catch (error) {
+            // Jika terjadi error, melemparkannya kembali
+            throw new Error(`Failed to send email: ${error.message}`);
+        }
     }
 }
 

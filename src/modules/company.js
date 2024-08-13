@@ -62,9 +62,9 @@ class Company {
                 const lastInsertId = result.insertId;
 
                 await userInstance.add(CONNECTION, lastInsertId, email, name, password, 3);
+                await this.#security.EmailActivationLink(email, PASS_ID)
                 await CONNECTION.commit()
 
-                await this.#security.EmailActivation(email)
             } else {
                 throw new Error("Email already exists!")
             }

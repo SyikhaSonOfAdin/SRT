@@ -83,6 +83,7 @@ const TABLES = {
             ID: "ID",
             REPORT_ID: "REPORT_ID",
             ASSIGNED_USER: "ASSIGNED_USER",
+            INPUT_DATE: "INPUT_DATE",
             FINISH_DATE: "FINISH_DATE",
             RESULT: "RESULT",
             PROBLEMS: "PROBLEMS",
@@ -94,12 +95,22 @@ const TABLES = {
         COLUMN: {
             ID: "ID",
             COMPANY_ID: "COMPANY_ID",
-            INPUT_BY: "INPUT_BY",
             COMPANY_CODE: "COMPANY_CODE",
             URL: "URL",
+        }
+    },
+    LIST_PRIVILEGE: {
+        TABLE: "list_privilege",
+        COLUMN: {
+            ID: "ID",
+            USER_ID: "USER_ID",
+            TABLE: "TABLE",
+            CAN_CREATE: "CAN_CREATE",
+            CAN_READ: "CAN_READ",
+            CAN_UPDATE: "CAN_UPDATE",
+            CAN_DELETE: "CAN_DELETE",
         }
     }
 };
 
-
-module.exports = TABLES
+module.exports = TABLES;
