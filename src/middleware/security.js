@@ -75,51 +75,60 @@ class Security {
 
   login = async (email, password) => {
     const CONNECTION = await SRT.getConnection();
-    const QUERY_COMPANY = `SELECT * FROM ${TABLES.COMPANY.TABLE} WHERE ${TABLES.COMPANY.COLUMN.EMAIL} = ?`;
-    const QUERY_USER = `SELECT U.*, C.${TABLES.COMPANY.COLUMN.NAME} FROM ${TABLES.USER.TABLE} AS U JOIN ${TABLES.COMPANY.TABLE} AS C ON U.${TABLES.USER.COLUMN.COMPANY_ID} = C.${TABLES.COMPANY.COLUMN.ID} WHERE U.${TABLES.USER.COLUMN.EMAIL} = ?`;
+    const QUERY_USER = `
+        SELECT 
+            U.*, 
+            C.${TABLES.COMPANY.COLUMN.STATUS} AS STATUS,  
+            C.${TABLES.COMPANY.COLUMN.NAME} AS companyName, 
+            C.${TABLES.COMPANY.COLUMN.PASS_ID} AS passId
+        FROM ${TABLES.USER.TABLE} AS U 
+        JOIN ${TABLES.COMPANY.TABLE} AS C 
+        ON U.${TABLES.USER.COLUMN.COMPANY_ID} = C.${TABLES.COMPANY.COLUMN.ID} 
+        WHERE U.${TABLES.USER.COLUMN.EMAIL} = ?;
+    `;
+    const QUERY_PRIVILEGES = `
+        SELECT *
+        FROM ${TABLES.LIST_PRIVILEGE.TABLE}
+        WHERE ${TABLES.LIST_PRIVILEGE.COLUMN.USER_ID} = ?;
+    `;
     const PARAMS = [email];
 
     try {
-      let [companyResult] = await CONNECTION.query(QUERY_COMPANY, PARAMS);
-      let [userResult] = await CONNECTION.query(QUERY_USER, PARAMS);
+      // Mendapatkan informasi user dan perusahaan
+      const [userResult] = await CONNECTION.query(QUERY_USER, PARAMS);
 
-      if (companyResult.length > 0 && userResult.length > 0) {
-        // Email found in both tables
-        const company = companyResult[0];
+      if (userResult.length > 0) {
         const user = userResult[0];
+        const isPasswordMatch = await bcrypt.compare(password, user[TABLES.USER.COLUMN.PASSWORD]);
 
-        const isCompanyPasswordMatch = await bcrypt.compare(password, company[TABLES.COMPANY.COLUMN.PASSWORD]);
-        const isUserPasswordMatch = await bcrypt.compare(password, user[TABLES.USER.COLUMN.PASSWORD]);
+        if (isPasswordMatch) {
+          if (user[TABLES.COMPANY.COLUMN.STATUS] === 'ACTIVE') {
+            // Mendapatkan privileges untuk user
+            const [privilegesResult] = await CONNECTION.query(QUERY_PRIVILEGES, [user[TABLES.USER.COLUMN.ID]]);
 
-        if (isCompanyPasswordMatch && isUserPasswordMatch) {
-          if (company[TABLES.COMPANY.COLUMN.STATUS] == 'ACTIVE') {
+            // Mengumpulkan privileges ke dalam satu objek
+            const privileges = privilegesResult.reduce((acc, privilege) => {
+              acc[privilege.TABLE] = {
+                can_create: privilege[TABLES.LIST_PRIVILEGE.COLUMN.CAN_CREATE],
+                can_read: privilege[TABLES.LIST_PRIVILEGE.COLUMN.CAN_READ],
+                can_update: privilege[TABLES.LIST_PRIVILEGE.COLUMN.CAN_UPDATE],
+                can_delete: privilege[TABLES.LIST_PRIVILEGE.COLUMN.CAN_DELETE],
+              };
+              return acc;
+            }, {});
+
             return {
-              cId: this.encrypt(company[TABLES.COMPANY.COLUMN.ID]), // Company Id
-              cName: company[TABLES.COMPANY.COLUMN.NAME], // Company Name
-              passC: this.encrypt(company[TABLES.COMPANY.COLUMN.PASS_ID]), // Company Pass Code
+              cId: this.encrypt(user[TABLES.USER.COLUMN.COMPANY_ID]), // Company Id
+              cName: user.companyName, // Company Name
+              passC: this.encrypt(user.passId), // Company Pass Code
               uId: this.encrypt(user[TABLES.USER.COLUMN.ID]), // User Id
               uName: user[TABLES.USER.COLUMN.USERNAME], // Username
-              jwtToken: jwt.sign({ email: company[TABLES.COMPANY.COLUMN.EMAIL] }, process.env.SECRET_KEY, { expiresIn: '1d' })
+              jwtToken: jwt.sign({ email: user[TABLES.USER.COLUMN.EMAIL] }, process.env.SECRET_KEY, { expiresIn: '1d' }),
+              privileges: privileges, // User Privileges
             };
           } else {
             throw new Error("Please finish your registration");
           }
-        } else {
-          throw new Error("Invalid password");
-        }
-      } else if (userResult.length > 0) {
-        // Email found only in user table
-        const user = userResult[0];
-        const isMatch = await bcrypt.compare(password, user[TABLES.USER.COLUMN.PASSWORD]);
-
-        if (isMatch) {
-          return {
-            cId: this.encrypt(user[TABLES.USER.COLUMN.COMPANY_ID]), // Users Company Id
-            cName: user[TABLES.COMPANY.COLUMN.NAME], // Users Company Id
-            uId: this.encrypt(user[TABLES.USER.COLUMN.ID]), // User Id
-            uName: user[TABLES.USER.COLUMN.USERNAME], // User Name
-            jwtToken: jwt.sign({ email: user[TABLES.USER.COLUMN.EMAIL] }, process.env.SECRET_KEY, { expiresIn: '1d' })
-          };
         } else {
           throw new Error("Invalid password");
         }
@@ -132,6 +141,8 @@ class Security {
       CONNECTION.release();
     }
   };
+
+
 
   verifyToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];

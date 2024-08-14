@@ -12,7 +12,7 @@ router.post(ENDPOINTS.POST.USER.ADD, security.verifyToken, security.verifyUser, 
     const { email, username, password, level, privileges } = req.body
     const companyId = req.body.companyId
     const userId = req.body.userId
-
+    
     if (!email || !username || !password || !privileges) {
         return res.status(403).json({
             message: 'Invalid parameters'
