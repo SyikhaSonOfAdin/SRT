@@ -1,13 +1,14 @@
 const { listEmailInstance } = require('../../../src/modules/listEmail');
 const Security = require('../../../src/middleware/security');
 const ENDPOINTS = require('../../../.conf/.conf_endpoints');
+const TABLES = require('../../../.conf/.conf_tables');
 const SRT = require('../../../.conf/.conf_database');
 const express = require('express');
 const router = express.Router();
 
 const security = new Security()
 
-router.get(ENDPOINTS.GET.LIST_EMAIL.BY_COMPANY_ID, security.verifyToken, async (req, res) => {
+router.get(ENDPOINTS.GET.LIST_EMAIL.BY_COMPANY_ID, security.verifyToken, security.verifyPrivilege(TABLES.LIST_EMAIL.TABLE, TABLES.LIST_PRIVILEGE.COLUMN.CAN_READ), async (req, res) => {
     const companyId = security.decrypt(req.params.companyId)
 
     if (!companyId) {

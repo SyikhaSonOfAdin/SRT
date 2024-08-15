@@ -195,6 +195,52 @@ class Security {
       CONNECTION.release()
     }
   }
+
+  verifyPrivilege = (table, action) => {
+    return async (req, res, next) => {
+      const CONNECTION = await SRT.getConnection()
+
+      try {
+        // const userId = this.decrypt(req.params.userId || req.body.uId)
+        // const userId = req.body.userId
+        let userId
+        if (req.params.userId) {
+          userId = this.decrypt(req.params.userId)          
+        } else if (req.body.userId) {
+          userId = req.body.userId
+        }
+        
+        const QUERY = [
+          `SELECT * FROM ${TABLES.LIST_PRIVILEGE.TABLE} WHERE ${TABLES.LIST_PRIVILEGE.COLUMN.USER_ID} = ?`
+        ]
+        const PARAMS = [[userId]]
+        const [privileges] = await CONNECTION.query(QUERY[0], PARAMS[0])
+
+        let hasPrivilege = false;
+
+        privileges.forEach((privilege) => {
+          if (privilege[TABLES.LIST_PRIVILEGE.COLUMN.TABLE] === table) {
+            if (privilege[action]) {
+              hasPrivilege = true;
+              next(); // Panggil next jika ditemukan privilege yang sesuai
+            }
+          }
+        });
+
+        if (!hasPrivilege) {
+          return res.status(403).json({
+            message: "Forbidden to do this action"
+          });
+        }
+      } catch (error) {
+        res.status(500).json({
+          message: error.message
+        })
+      } finally {
+        CONNECTION.release()
+      }
+    }
+  }
 }
 
 module.exports = Security

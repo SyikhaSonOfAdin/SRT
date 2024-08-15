@@ -1,13 +1,12 @@
 const { departmentInstance } = require('../../../src/modules/department');
 const Security = require('../../../src/middleware/security');
 const ENDPOINTS = require('../../../.conf/.conf_endpoints');
-const TABLES = require('../../../.conf/.conf_tables');
 const express = require('express');
 const router = express.Router();
 
 const security = new Security()
 
-router.get(ENDPOINTS.GET.DEPARTMENTS.BY_COMPANY_ID, security.verifyToken, security.verifyPrivilege(TABLES.COMPANY_DEPARTMENTS.TABLE, TABLES.LIST_PRIVILEGE.COLUMN.CAN_READ), async (req, res) => {
+router.get(ENDPOINTS.GET.DEPARTMENTS.PUBLIC, security.verifyToken, async (req, res) => {
     const companyId = security.decrypt(req.params.companyId)
 
     if (!companyId) {

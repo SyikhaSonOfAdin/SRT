@@ -10,28 +10,30 @@ class Users {
     add = async (CONNECTION, companyId, email, username, password, level) => {
         const QUERY = `
             INSERT INTO ${TABLES.USER.TABLE} 
-            (${TABLES.USER.COLUMN.COMPANY_ID}, ${TABLES.USER.COLUMN.EMAIL}, ${TABLES.USER.COLUMN.USERNAME}, ${TABLES.USER.COLUMN.PASSWORD}, ${TABLES.USER.COLUMN.LEVEL})
-            VALUES (?, ?, ?, ?, ?)
+            (${TABLES.USER.COLUMN.ID}, ${TABLES.USER.COLUMN.COMPANY_ID}, ${TABLES.USER.COLUMN.EMAIL}, ${TABLES.USER.COLUMN.USERNAME}, ${TABLES.USER.COLUMN.PASSWORD}, ${TABLES.USER.COLUMN.LEVEL})
+            VALUES (?, ?, ?, ?, ?, ?)
         `;
+        const userId = uuidv4()
         const PASSWORD_HASH = await bcrypt.hash(password, 13);
-        const PARAMS = [companyId, email, username, PASSWORD_HASH, level];
+        const PARAMS = [userId, companyId, email, username, PASSWORD_HASH, level];
 
         try {
             const [result] = await CONNECTION.query(QUERY, PARAMS);
-            return result.insertId; // Mengembalikan ID dari user yang baru ditambahkan
+            return userId // Mengembalikan ID dari user yang baru ditambahkan
         } catch (error) {
             console.error("Error inserting new user:", error);
             throw new Error("Failed to add new user. Please try again.");
         }
     };
 
-    edit = async (CONNECTION, email, username, password, level, userId) => {
+    edit = async (CONNECTION, email, username, userId) => {
         const QUERY = [
-            `UPDATE ${TABLES.USER.TABLE} SET ${TABLES.USER.COLUMN.EMAIL} = ?, ${TABLES.USER.COLUMN.USERNAME} = ?, ${TABLES.USER.COLUMN.PASSWORD} = ?, ${TABLES.USER.COLUMN.LEVEL} = ?
+            `UPDATE ${TABLES.USER.TABLE} SET ${TABLES.USER.COLUMN.EMAIL} = ?, ${TABLES.USER.COLUMN.USERNAME} = ?
             WHERE ${TABLES.USER.COLUMN.ID} = ?`
         ]
-        const PASSWORD = await bcrypt.hash(password, 13)
-        const PARAMS = [[email, username, PASSWORD, level, userId]]
+        // const PASSWORD = await bcrypt.hash(password, 13)
+        // const PARAMS = [[email, username, PASSWORD, level, userId]]
+        const PARAMS = [[email, username, userId]]
 
         try {
             await CONNECTION.query(QUERY[0], PARAMS[0])
@@ -63,6 +65,52 @@ class Users {
         try {
             const [result] = await CONNECTION.query(QUERY[0], PARAMS[0])
             return result
+        } catch (error) {
+            throw error
+        }
+    }
+
+    getByUserId = async (CONNECTION, userId) => {
+        const QUERY_USER = `
+        SELECT 
+            U.*, 
+            C.${TABLES.COMPANY.COLUMN.STATUS} AS STATUS,  
+            C.${TABLES.COMPANY.COLUMN.NAME} AS companyName, 
+            C.${TABLES.COMPANY.COLUMN.PASS_ID} AS passId
+        FROM ${TABLES.USER.TABLE} AS U 
+        JOIN ${TABLES.COMPANY.TABLE} AS C 
+        ON U.${TABLES.USER.COLUMN.COMPANY_ID} = C.${TABLES.COMPANY.COLUMN.ID} 
+        WHERE U.${TABLES.USER.COLUMN.ID} = ?;
+    `;
+        const QUERY_PRIVILEGES = `
+        SELECT *
+        FROM ${TABLES.LIST_PRIVILEGE.TABLE}
+        WHERE ${TABLES.LIST_PRIVILEGE.COLUMN.USER_ID} = ?;
+    `;
+        const PARAMS = [[userId]];
+
+        try {
+            const [userResult] = await CONNECTION.query(QUERY_USER, PARAMS[0]);
+            const user = userResult[0];
+            const [privilegesResult] = await CONNECTION.query(QUERY_PRIVILEGES, [user[TABLES.USER.COLUMN.ID]]);
+            // Mengumpulkan privileges ke dalam satu objek
+            const privileges = privilegesResult.reduce((acc, privilege) => {
+                acc[privilege.TABLE] = {
+                    can_create: privilege[TABLES.LIST_PRIVILEGE.COLUMN.CAN_CREATE],
+                    can_read: privilege[TABLES.LIST_PRIVILEGE.COLUMN.CAN_READ],
+                    can_update: privilege[TABLES.LIST_PRIVILEGE.COLUMN.CAN_UPDATE],
+                    can_delete: privilege[TABLES.LIST_PRIVILEGE.COLUMN.CAN_DELETE],
+                };
+                return acc;
+            }, {});
+
+            return {
+                cName: user.companyName, // Company Name
+                uId: user[TABLES.USER.COLUMN.ID], // User Id
+                uName: user[TABLES.USER.COLUMN.USERNAME], // Username
+                eAddr: user[TABLES.USER.COLUMN.EMAIL], // Email
+                privileges: privileges, // User Privileges
+            };
         } catch (error) {
             throw error
         }

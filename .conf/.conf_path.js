@@ -5,18 +5,22 @@ const PATH = {
         },
         CATEGORY: {
             BY_COMPANY_ID: require('../APIS/GET/category/byCompanyId'),
+            PUBLIC: require('../APIS/GET/category/public'),
         },
         DEPARTMENTS: {
             BY_COMPANY_ID: require('../APIS/GET/departments/byCompanyId'),
+            PUBLIC: require('../APIS/GET/departments/public'),
         },
         USER: {
             BY_COMPANY_ID: require('../APIS/GET/user/byCompanyId'),
+            BY_USER_ID: require('../APIS/GET/user/byUserId'),
         },
         LIST_EMAIL: {
             BY_COMPANY_ID: require('../APIS/GET/listEmail/byCompanyId'),
         },
         LOCATIONS: {
             BY_COMPANY_ID: require('../APIS/GET/locations/byCompanyId'),
+            PUBLIC: require('../APIS/GET/locations/public'),
         },
         REPORT: {
             BY_COMPANY_ID: require('../APIS/GET/report/byCompanyId'),
@@ -74,14 +78,18 @@ const ARRAY_OF_PATHS = {
         PATH.GET.COMPANY.CONFIRMATION,
 
         PATH.GET.CATEGORY.BY_COMPANY_ID,
+        PATH.GET.CATEGORY.PUBLIC,
 
         PATH.GET.DEPARTMENTS.BY_COMPANY_ID,
+        PATH.GET.DEPARTMENTS.PUBLIC,
 
         PATH.GET.USER.BY_COMPANY_ID,
+        PATH.GET.USER.BY_USER_ID,
 
         PATH.GET.LIST_EMAIL.BY_COMPANY_ID,
 
         PATH.GET.LOCATIONS.BY_COMPANY_ID,
+        PATH.GET.LOCATIONS.PUBLIC,
 
         PATH.GET.REPORT.BY_COMPANY_ID,
         PATH.GET.REPORT.DOWNLOAD,

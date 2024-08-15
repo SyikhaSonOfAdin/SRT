@@ -4,22 +4,26 @@ const ENDPOINTS = {
             CONFIRMATION: '/company/registration/c/:passId',
         },
         CATEGORY: {            
-            BY_COMPANY_ID: '/category/:companyId',
+            BY_COMPANY_ID: '/category/:companyId/:userId',
+            PUBLIC: '/category/:companyId',
         },
         DEPARTMENTS: {
-            BY_COMPANY_ID: '/departments/:companyId'
+            BY_COMPANY_ID: '/departments/:companyId/:userId',
+            PUBLIC: '/departments/:companyId',
         },
         USER: {
-            BY_COMPANY_ID: '/user/:companyId'
+            BY_COMPANY_ID: '/user/:companyId/:userId',
+            BY_USER_ID: '/user/:getUser/:companyId/:userId',
         },
         LIST_EMAIL: {
-            BY_COMPANY_ID: '/email/:companyId'
+            BY_COMPANY_ID: '/email/:companyId/:userId'
         },
         LOCATIONS: {
-            BY_COMPANY_ID: '/locations/:companyId'
+            BY_COMPANY_ID: '/locations/:companyId/:userId',
+            PUBLIC: '/locations/:companyId',
         },
         REPORT: {
-            BY_COMPANY_ID: '/report/:companyId',
+            BY_COMPANY_ID: '/report/:companyId/:userId',
             DOWNLOAD: '/report/:companyId/download',
         },
         SETTINGS: {

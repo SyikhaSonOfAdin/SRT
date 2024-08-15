@@ -45,6 +45,39 @@ class Privileges {
             throw error
         }
     };
+
+    edit = async (CONNECTION, userId, privileges) => {
+
+        try {
+            const QUERY = `
+                UPDATE ${TABLES.LIST_PRIVILEGE.TABLE} SET
+                    ${TABLES.LIST_PRIVILEGE.COLUMN.CAN_CREATE} = ?, 
+                    ${TABLES.LIST_PRIVILEGE.COLUMN.CAN_READ} = ?, 
+                    ${TABLES.LIST_PRIVILEGE.COLUMN.CAN_UPDATE} = ?,
+                    ${TABLES.LIST_PRIVILEGE.COLUMN.CAN_DELETE} = ?
+                    WHERE ${TABLES.LIST_PRIVILEGE.COLUMN.USER_ID} = ? AND 
+                    \`${TABLES.LIST_PRIVILEGE.COLUMN.TABLE}\` = ?
+            `;
+
+            const promises = this.#tables.map(async (tableName) => {
+                const privilege = privileges[tableName] || {};
+                const { can_create, can_read, can_update, can_delete } = privilege;
+
+                await CONNECTION.query(QUERY, [
+                    can_create,
+                    can_read,
+                    can_update,
+                    can_delete,
+                    userId,
+                    tableName,
+                ]);
+            });
+
+            await Promise.all(promises);
+        } catch (error) {
+            throw error
+        }
+    };
 }
 
 const privilegesInstance = new Privileges();

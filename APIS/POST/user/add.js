@@ -4,11 +4,12 @@ const ENDPOINTS = require('../../../.conf/.conf_endpoints');
 const SRT = require('../../../.conf/.conf_database');
 const express = require('express');
 const { privilegesInstance } = require('../../../src/modules/privileges');
+const TABLES = require('../../../.conf/.conf_tables');
 const router = express.Router();
 
 const security = new Security()
 
-router.post(ENDPOINTS.POST.USER.ADD, security.verifyToken, security.verifyUser, async (req, res) => {
+router.post(ENDPOINTS.POST.USER.ADD, security.verifyToken, security.verifyUser, security.verifyPrivilege(TABLES.USER.TABLE, TABLES.LIST_PRIVILEGE.COLUMN.CAN_CREATE), async (req, res) => {
     const { email, username, password, level, privileges } = req.body
     const companyId = req.body.companyId
     const userId = req.body.userId

@@ -3,11 +3,12 @@ const Security = require('../../../src/middleware/security');
 const express = require('express');
 const { listEmailInstance } = require('../../../src/modules/listEmail');
 const SRT = require('../../../.conf/.conf_database');
+const TABLES = require('../../../.conf/.conf_tables');
 const router = express.Router();
 
 const security = new Security()
 
-router.post(ENDPOINTS.POST.LIST_EMAIL.ADD, security.verifyToken, security.verifyUser, async (req, res) => {
+router.post(ENDPOINTS.POST.LIST_EMAIL.ADD, security.verifyToken, security.verifyUser, security.verifyPrivilege(TABLES.LIST_EMAIL.TABLE, TABLES.LIST_PRIVILEGE.COLUMN.CAN_CREATE), async (req, res) => {
     const { emailAddress } = req.body
     const companyId = req.body.companyId
     const userId = req.body.userId
