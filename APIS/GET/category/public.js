@@ -7,7 +7,7 @@ const router = express.Router();
 
 const security = new Security()
 
-router.get(ENDPOINTS.GET.CATEGORY.PUBLIC, security.verifyToken, async (req, res) => {
+router.get(ENDPOINTS.GET.CATEGORY.PUBLIC, async (req, res) => {
     const companyId = security.decrypt(req.params.companyId)
 
     if (!companyId) {

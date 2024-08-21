@@ -10,7 +10,7 @@ const queues = new Map();
 
 const security = new Security()
 
-router.post(ENDPOINTS.POST.REPORT.ADD, security.verifyToken, async (req, res) => {
+router.post(ENDPOINTS.POST.REPORT.ADD, async (req, res) => {
     const { companyId, locationId, departmentId, categoryId, inputBy, reportIssued } = req.body;
 
     if (!companyId) return res.status(400).json({ message: 'Invalid parameters' })

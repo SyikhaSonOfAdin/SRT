@@ -27,10 +27,8 @@ class Settings {
         }
     }
 
-    generateURL = (companyId, code) => {
+    generateURL = (companyId) => {
         try {
-            const token = jwt.sign({ companyId, code }, process.env.SECRET_KEY, { expiresIn: '90d' });
-
             // Pastikan enkripsi berjalan dengan benar dan menghasilkan string yang valid
             const encryptedCompanyId = this.#security.encrypt(companyId);
             if (!encryptedCompanyId) {
@@ -39,7 +37,7 @@ class Settings {
 
             // Gunakan URLSearchParams dengan benar
             const cId = new URLSearchParams({ cId: encryptedCompanyId }).toString();
-            const url = `${process.env?.URL_APP}/report/p/${token}?${cId}`;
+            const url = `${process.env?.URL_APP}/report/p?${cId}`;
             return url;
         } catch (error) {
             console.error('Error generating URL:', error);
