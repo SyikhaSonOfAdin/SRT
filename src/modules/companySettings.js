@@ -1,6 +1,4 @@
-const SRT = require("../../.conf/.conf_database");
 const TABLES = require("../../.conf/.conf_tables");
-const jwt = require('jsonwebtoken');
 const Security = require("../middleware/security");
 
 class Settings {
