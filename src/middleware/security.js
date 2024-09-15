@@ -123,7 +123,7 @@ class Security {
               passC: this.encrypt(user.passId), // Company Pass Code
               uId: this.encrypt(user[TABLES.USER.COLUMN.ID]), // User Id
               uName: user[TABLES.USER.COLUMN.USERNAME], // Username
-              jwtToken: jwt.sign({ email: user[TABLES.USER.COLUMN.EMAIL] }, process.env.SECRET_KEY, { expiresIn: '1d' }),
+              jwtToken: jwt.sign({ email: user[TABLES.USER.COLUMN.EMAIL] }, process.env.SECRET_KEY, { expiresIn: '7d' }),
               privileges: privileges, // User Privileges
             };
           } else {
