@@ -124,6 +124,7 @@ class Security {
               uId: this.encrypt(user[TABLES.USER.COLUMN.ID]), // User Id
               uName: user[TABLES.USER.COLUMN.USERNAME], // Username
               jwtToken: jwt.sign({ email: user[TABLES.USER.COLUMN.EMAIL] }, process.env.SECRET_KEY, { expiresIn: '7d' }),
+              version: "1.1.1",
               privileges: privileges, // User Privileges
             };
           } else {

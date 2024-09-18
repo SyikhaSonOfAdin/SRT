@@ -8,7 +8,7 @@ const ARRAY_OF_PATHS = require('./.conf/.conf_path');
 const app = express();
 const port = 3000;
 const corsOptions = {
-    origin: 'http://srt.syikha.com',
+    origin: '*' || 'http://srt.syikha.com',
     optionsSuccessStatus: 200
 }
 app.use(cors(corsOptions));
