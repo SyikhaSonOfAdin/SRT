@@ -1,20 +1,23 @@
 require('dotenv').config();
 
-const express = require('express')  ;
-const path = require('path') ;
+const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const ARRAY_OF_PATHS = require('./.conf/.conf_path');
 
 const app = express();
 const port = 3000;
-
-app.use(cors());
+const corsOptions = {
+    origin: 'http://srt.syikha.com',
+    optionsSuccessStatus: 200
+}
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '')));
 
 
-app.get('/', (req, res) =>{
+app.get('/', (req, res) => {
     res.send('<h1>Hi Your SRT API is Available🚀</h1>')
 })
 

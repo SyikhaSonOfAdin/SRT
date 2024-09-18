@@ -11,6 +11,9 @@ const ENDPOINTS = {
             BY_COMPANY_ID: '/departments/:companyId/:userId',
             PUBLIC: '/departments/:companyId',
         },
+        DOWNLOAD: {
+            REPORT: '/download/report/:companyId',
+        },
         USER: {
             BY_COMPANY_ID: '/user/:companyId/:userId',
             BY_USER_ID: '/user/:getUser/:companyId/:userId',
@@ -23,8 +26,7 @@ const ENDPOINTS = {
             PUBLIC: '/locations/:companyId',
         },
         REPORT: {
-            BY_COMPANY_ID: '/report/:companyId/:userId',
-            DOWNLOAD: '/report/:companyId/download',
+            BY_COMPANY_ID: '/report/:companyId/:userId',            
         },
         SETTINGS: {
             BY_COMPANY_ID: '/settings/:companyId'

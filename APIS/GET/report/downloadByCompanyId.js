@@ -7,16 +7,10 @@ const router = express.Router();
 
 const security = new Security()
 
-router.get(ENDPOINTS.GET.REPORT.DOWNLOAD, security.verifyToken, async (req, res) => {
+router.get(ENDPOINTS.GET.DOWNLOAD.REPORT, security.verifyToken, async (req, res) => {
     const companyId = security.decrypt(req.params.companyId)
 
-    if (!companyId) {
-        return res.status(400).json({
-            message: "Invalid parameters"
-        })
-    }
-
-    
+    if (!companyId) return res.status(400).json({message: "Invalid parameters"})    
 
     try {
         const DATA = await reportInstance.get(companyId)

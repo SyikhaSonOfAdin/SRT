@@ -145,8 +145,7 @@ class Security {
 
 
   verifyToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader
+    const token = req.headers['authorization'] || req.query.token
 
     if (!token) {
       return res.status(401).json({ message: 'No token provided' });
