@@ -124,7 +124,7 @@ class Security {
               uId: this.encrypt(user[TABLES.USER.COLUMN.ID]), // User Id
               uName: user[TABLES.USER.COLUMN.USERNAME], // Username
               jwtToken: jwt.sign({ email: user[TABLES.USER.COLUMN.EMAIL] }, process.env.SECRET_KEY, { expiresIn: '7d' }),
-              version: "1.1.1",
+              version: "1.2.2",
               privileges: privileges, // User Privileges
             };
           } else {
@@ -203,12 +203,12 @@ class Security {
       try {
         // const userId = this.decrypt(req.params.userId || req.body.uId)
         // const userId = req.body.userId
-        let userId
-        if (req.params.userId) {
-          userId = this.decrypt(req.params.userId)          
-        } else if (req.body.userId) {
-          userId = req.body.userId
-        }
+        const userId = req.body.userId || this.decrypt(req.params.userId)
+        // if (req.params.userId) {
+        //   userId = this.decrypt(req.params.userId)          
+        // } else if (req.body.userId) {
+        //   userId = req.body.userId
+        // }
         
         const QUERY = [
           `SELECT * FROM ${TABLES.LIST_PRIVILEGE.TABLE} WHERE ${TABLES.LIST_PRIVILEGE.COLUMN.USER_ID} = ?`

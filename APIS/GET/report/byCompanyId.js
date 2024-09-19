@@ -9,6 +9,7 @@ const security = new Security()
 
 router.get(ENDPOINTS.GET.REPORT.BY_COMPANY_ID, security.verifyToken, security.verifyPrivilege(TABLES.REPORT.TABLE, TABLES.LIST_PRIVILEGE.COLUMN.CAN_READ), async (req, res) => {
     const companyId = security.decrypt(req.params.companyId)
+    const searchPattern = req.query.s
 
     if (!companyId) {
         return res.status(400).json({
@@ -17,7 +18,7 @@ router.get(ENDPOINTS.GET.REPORT.BY_COMPANY_ID, security.verifyToken, security.ve
     }
 
     try {
-        const DATA = await reportInstance.get(companyId)
+        const DATA = await reportInstance.get(companyId, searchPattern)
         res.status(200).json({
             data: DATA
         })
