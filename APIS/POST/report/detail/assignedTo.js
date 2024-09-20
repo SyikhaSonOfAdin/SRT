@@ -4,12 +4,13 @@ const Security = require('../../../../src/middleware/security');
 const ENDPOINTS = require('../../../../.conf/.conf_endpoints');
 const SRT = require('../../../../.conf/.conf_database');
 const express = require('express');
+const TABLES = require('../../../../.conf/.conf_tables');
 const router = express.Router();
 const queues = new Map();
 
 const security = new Security()
 
-router.post(ENDPOINTS.POST.REPORT.ASSIGN, security.verifyToken, security.verifyUser, async (req, res) => {
+router.post(ENDPOINTS.POST.REPORT.ASSIGN, security.verifyToken, security.verifyUser, security.verifyPrivilege(TABLES.REPORT.TABLE, TABLES.LIST_PRIVILEGE.COLUMN.CAN_CREATE), async (req, res) => {
     const { reportId } = req.body;
     const companyId = req.body.companyId
     const userId = req.body.userId
