@@ -124,7 +124,7 @@ class Security {
               uId: this.encrypt(user[TABLES.USER.COLUMN.ID]), // User Id
               uName: user[TABLES.USER.COLUMN.USERNAME], // Username
               jwtToken: jwt.sign({ email: user[TABLES.USER.COLUMN.EMAIL] }, process.env.SECRET_KEY, { expiresIn: '7d' }),
-              version: "1.2.4",
+              version: "1.2.6",
               privileges: privileges, // User Privileges
             };
           } else {
@@ -229,7 +229,7 @@ class Security {
 
         if (!hasPrivilege) {
           return res.status(403).json({
-            message: "Forbidden to do this action"
+            message: "Not Authorized"
           });
         }
       } catch (error) {
