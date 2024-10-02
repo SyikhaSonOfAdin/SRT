@@ -18,14 +18,13 @@ router.get(ENDPOINTS.GET.DOWNLOAD.REPORT, security.verifyToken, async (req, res)
         const worksheet = workbook.addWorksheet('Data');
 
         // Definisikan header sesuai kebutuhan
-        const headers = ['Ticket No', 'Submit Date', 'By', 'Location', 'Department', 'Category', 'Message', 'Assigned To', 'Finish Date', 'Status', 'Result', 'Problem', 'Solution']; // Gantilah dengan header yang sesuai
+        const headers = ['Ticket No', 'Submit Date', 'Category', 'PIC', 'Message', 'Assigned To', 'Finish Date', 'Status', 'Result', 'Problem', 'Solution']; // Gantilah dengan header yang sesuai
 
         // Tambahkan header ke worksheet
         worksheet.addRow(headers);
 
         DATA.forEach((row) => {
-            worksheet.addRow([row.TICKET, row.INPUT_DATE, row.REPORT_BY, 
-                row.LOCATION, row.DEPARTMENT, row.CATEGORY, row.REPORT_ISSUE, row.ASSIGNED_TO, row.FINISH_DATE, row.STATUS,
+            worksheet.addRow([row.TICKET, row.INPUT_DATE, row.CATEGORY, `${row.REPORT_BY}/${row.DEPARTMENT}/${row.LOCATION}`, row.REPORT_ISSUE, row.ASSIGNED_TO, row.FINISH_DATE, row.STATUS,
                 row.RESULT, row.PROBLEM, row.SOLUTION
             ]);
         });
