@@ -6,8 +6,8 @@ class ListEmail extends Email {
 
     add = async (CONNECTION, companyId, email, userId) => {
         const QUERY = [
-            `INSERT INTO ${TABLES.LIST_EMAIL.TABLE} (${TABLES.LIST_EMAIL.COLUMN.EMAIL}, ${TABLES.LIST_EMAIL.COLUMN.COMPANY_ID}, ${TABLES.LIST_EMAIL.COLUMN.INPUT_BY})
-            VALUES (?,?,?)`
+            `INSERT INTO ${TABLES.LIST_EMAIL.TABLE} (${TABLES.LIST_EMAIL.COLUMN.EMAIL}, ${TABLES.LIST_EMAIL.COLUMN.COMPANY_ID}, ${TABLES.LIST_EMAIL.COLUMN.INPUT_BY}, ${TABLES.LIST_EMAIL.COLUMN.INPUT_DATE})
+            VALUES (?,?,?, NOW())`
         ]
         const PARAMS = [[email, companyId, userId]]
 

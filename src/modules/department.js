@@ -6,7 +6,7 @@ class Department {
         const CONNECTION = await SRT.getConnection()
         const QUERY = [
             `INSERT INTO ${TABLES.COMPANY_DEPARTMENTS.TABLE} (${TABLES.COMPANY_DEPARTMENTS.COLUMN.COMPANY_ID}, ${TABLES.COMPANY_DEPARTMENTS.COLUMN.INPUT_BY}, 
-            ${TABLES.COMPANY_DEPARTMENTS.COLUMN.NAME}) VALUES (?,?,?)`
+            ${TABLES.COMPANY_DEPARTMENTS.COLUMN.NAME}, ${TABLES.COMPANY_DEPARTMENTS.COLUMN.INPUT_DATE}) VALUES (?,?,?, NOW())`
         ]
         const PARAMS = [[companyId, userId, departmentName]]
 

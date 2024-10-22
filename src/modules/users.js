@@ -10,8 +10,8 @@ class Users {
     add = async (CONNECTION, companyId, email, username, password, level) => {
         const QUERY = `
             INSERT INTO ${TABLES.USER.TABLE} 
-            (${TABLES.USER.COLUMN.ID}, ${TABLES.USER.COLUMN.COMPANY_ID}, ${TABLES.USER.COLUMN.EMAIL}, ${TABLES.USER.COLUMN.USERNAME}, ${TABLES.USER.COLUMN.PASSWORD}, ${TABLES.USER.COLUMN.LEVEL})
-            VALUES (?, ?, ?, ?, ?, ?)
+            (${TABLES.USER.COLUMN.ID}, ${TABLES.USER.COLUMN.COMPANY_ID}, ${TABLES.USER.COLUMN.EMAIL}, ${TABLES.USER.COLUMN.USERNAME}, ${TABLES.USER.COLUMN.PASSWORD}, ${TABLES.USER.COLUMN.LEVEL}, ${TABLES.USER.COLUMN.SINCE})
+            VALUES (?, ?, ?, ?, ?, ?, NOW())
         `;
         const userId = uuidv4()
         const PASSWORD_HASH = await bcrypt.hash(password, 13);

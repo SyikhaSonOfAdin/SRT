@@ -7,7 +7,7 @@ class Report {
         const QUERY = [
             `INSERT INTO ${TABLES.REPORT.TABLE} (${TABLES.REPORT.COLUMN.LOCATION_ID}, ${TABLES.REPORT.COLUMN.DEPARTMENT_ID}, 
             ${TABLES.REPORT.COLUMN.CATEGORY_ID}, ${TABLES.REPORT.COLUMN.TICKET}, ${TABLES.REPORT.COLUMN.INPUT_BY}, 
-            ${TABLES.REPORT.COLUMN.REPORT_ISSUE}) VALUES (?,?,?,?,?,?)`
+            ${TABLES.REPORT.COLUMN.REPORT_ISSUE}, ${TABLES.REPORT.COLUMN.INPUT_DATE}) VALUES (?,?,?,?,?,?, NOW())`
         ]
         const PARAMS = [[locationId, departmentId, categoryId, ticketNo, inputBy, reportIssued]]
 

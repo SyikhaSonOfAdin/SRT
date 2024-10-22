@@ -48,8 +48,8 @@ class Company {
         const CONNECTION = await SRT.getConnection()
         const QUERY = [
             `INSERT INTO ${TABLES.COMPANY.TABLE} 
-            (${TABLES.COMPANY.COLUMN.EMAIL}, ${TABLES.COMPANY.COLUMN.PASSWORD}, ${TABLES.COMPANY.COLUMN.NAME}, ${TABLES.COMPANY.COLUMN.PASS_ID})
-            VALUES (?,?,?,?)`
+            (${TABLES.COMPANY.COLUMN.EMAIL}, ${TABLES.COMPANY.COLUMN.PASSWORD}, ${TABLES.COMPANY.COLUMN.NAME}, ${TABLES.COMPANY.COLUMN.PASS_ID}, ${TABLES.COMPANY.COLUMN.SINCE})
+            VALUES (?,?,?,?, NOW())`
         ]
 
         try {

@@ -4,8 +4,8 @@ const { Report } = require("./report");
 class ReportDetail extends Report {
     assign = async (CONNECTION, assignedTo, reportId) => {
         const QUERY = [`
-            INSERT INTO ${TABLES.REPORT_DETAIL.TABLE} (${TABLES.REPORT_DETAIL.COLUMN.ASSIGNED_USER}, ${TABLES.REPORT_DETAIL.COLUMN.REPORT_ID})
-            VALUES (?,?)`
+            INSERT INTO ${TABLES.REPORT_DETAIL.TABLE} (${TABLES.REPORT_DETAIL.COLUMN.ASSIGNED_USER}, ${TABLES.REPORT_DETAIL.COLUMN.REPORT_ID}, ${TABLES.REPORT_DETAIL.COLUMN.INPUT_DATE})
+            VALUES (?,?, NOW())`
         ]
         const PARAMS = [[assignedTo, reportId]]
 

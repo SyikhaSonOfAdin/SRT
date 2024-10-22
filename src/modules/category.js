@@ -4,8 +4,8 @@ const SRT = require("../../.conf/.conf_database")
 class Category {
     add = async (CONNECTION, companyId, userId, name) => {
         const QUERY = [
-            `INSERT INTO ${TABLES.LIST_CATEGORY.TABLE} (${TABLES.LIST_CATEGORY.COLUMN.COMPANY_ID}, ${TABLES.LIST_CATEGORY.COLUMN.INPUT_BY}, ${TABLES.LIST_CATEGORY.COLUMN.NAME})
-            VALUES (?,?,?)`
+            `INSERT INTO ${TABLES.LIST_CATEGORY.TABLE} (${TABLES.LIST_CATEGORY.COLUMN.COMPANY_ID}, ${TABLES.LIST_CATEGORY.COLUMN.INPUT_BY}, ${TABLES.LIST_CATEGORY.COLUMN.NAME}, ${TABLES.LIST_CATEGORY.COLUMN.INPUT_DATE})
+            VALUES (?,?,?, NOW())`
         ]
         const PARAMS = [[companyId, userId, name]]
 
